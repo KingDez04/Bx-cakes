@@ -23,19 +23,19 @@ const Home = () => {
       title: "Custom Cake",
       description:
         "Create your perfect cake from scratch—choose the shape, size, and finish that match your vision and taste.",
-      route: "/products?type=custom",
+      route: "/customize-cake",
     },
     modify: {
       title: "Modify Cake",
       description:
         "Create your perfect cake from scratch—choose the shape, size, and finish that match your vision and taste.",
-      route: "/products?type=modify",
+      route: "/modify-cake",
     },
     readymade: {
       title: "Ready Made Cake",
       description:
         "Create your perfect cake from scratch—choose the shape, size, and finish that match your vision and taste.",
-      route: "/products",
+      route: "/readymade-cake",
     },
   };
 
@@ -60,7 +60,7 @@ const Home = () => {
               </p>
               <div className="flex space-x-4">
                 <Link
-                  to="/products"
+                  to="/readymade-cake"
                   className="bg-white text-[#FF673F] px-8 py-3 rounded-full font-semibold hover:bg-pink-50 transition-colors"
                 >
                   Shop Now
@@ -135,7 +135,7 @@ const Home = () => {
             {categories.map((category, index) => (
               <Link
                 key={index}
-                to={`/products?category=${category.name}`}
+                to={`/readymade-cake?category=${category.name}`}
                 className="text-white text-center group"
               >
                 <img

@@ -14,9 +14,9 @@ const NavBar = () => {
   const navLinks = [
     { name: "Home", path: "/" },
     { name: "About us", path: "/about" },
-    { name: "Custom Order", path: "/products" },
-    { name: "Modify A Cake", path: "/products" },
-    { name: "Shop Our Ready Made Cakes", path: "/products" },
+    { name: "Custom Order", path: "/customize-cake" },
+    { name: "Modify A Cake", path: "/modify-cake" },
+    { name: "Shop Our Ready Made Cakes", path: "/readymade-cake" },
   ];
 
   return (
@@ -58,7 +58,7 @@ const NavBar = () => {
 
             <button
               onClick={() => navigate("/profile")}
-              className="w-10 md:w-[73px] h-10 md:h-[73px] rounded-full overflow-hidden border-2 border-transparent hover:border-[#FD5A2F] transition-colors"
+              className="w-10 md:w-[73px] h-10 md:h-[73px] rounded-full overflow-hidden border-2 border-transparent hover:border-[#FD5A2F] transition-colors cursor-pointer"
             >
               <img src={dp} className="w-full h-full object-cover" />
             </button>
