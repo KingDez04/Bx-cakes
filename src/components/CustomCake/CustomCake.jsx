@@ -6,6 +6,8 @@ import {
   ChevronDown,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import Footer from "../Footer/Footer";
+import TopReviews from "../TopReviews/TopReviews";
 import rectCake from "../../assets/rectangleCake.png";
 import sqrCake from "../../assets/squareCake.png";
 import circleCake from "../../assets/circleCake.png";
@@ -742,7 +744,13 @@ const CustomCake = () => {
   const isConfirmPage = currentStep === getConfirmStep();
 
   return (
-    <div className={`min-h-screen ${isConfirmPage ? "bg-white" : "bg-black"}`}>
+    <div
+      className={`min-h-screen ${
+        isConfirmPage
+          ? "bg-white"
+          : "bg-linear-to-br from-[#8B4513] via-black to-[#D2691E]"
+      }`}
+    >
       <div className="bg-linear-to-br from-[#8B4513] via-[#A0522D] to-[#D2691E] py-6 md:py-8">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-2xl md:text-4xl font-bold text-white">
@@ -811,6 +819,8 @@ const CustomCake = () => {
           </div>
         )}
       </div>
+      <TopReviews />
+      <Footer />
     </div>
   );
 };
