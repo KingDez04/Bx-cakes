@@ -1,4 +1,355 @@
+import { Link } from "react-router-dom";
+import { useState } from "react";
+import Footer from "../Footer/Footer";
+import heroCake from "../../assets/cake3.png";
+import halfCake from "../../assets/halfCakeVector.png";
+import sugar from "../../assets/sugarVector.png";
+import cake from "../../assets/cakeVector.png";
+import cake1 from "../../assets/cake4.png";
+import cake2 from "../../assets/cake5.png";
+import cake3 from "../../assets/cake6.png";
+import cake4 from "../../assets/cake2.png";
+import alexa from "../../assets/alexa.png";
+import sarah from "../../assets/sarah.png";
+import damilola from "../../assets/damilola.png";
+import customCake from "../../assets/customCake.png";
+import modifyCake from "../../assets/modifyCake.png";
+import readyMadeCake from "../../assets/readyMadeCake.png";
+
 const Home = () => {
-  return <div>Home</div>;
+  const [selectedOption, setSelectedOption] = useState(null);
+
+  // Options data with descriptions
+  const orderOptions = {
+    custom: {
+      title: "Custom Cake",
+      description:
+        "Create your perfect cake from scratch—choose the shape, size, and finish that match your vision and taste.",
+      route: "/products?type=custom",
+    },
+    modify: {
+      title: "Modify Cake",
+      description:
+        "Create your perfect cake from scratch—choose the shape, size, and finish that match your vision and taste.",
+      route: "/products?type=modify",
+    },
+    readymade: {
+      title: "Ready Made Cake",
+      description:
+        "Create your perfect cake from scratch—choose the shape, size, and finish that match your vision and taste.",
+      route: "/products",
+    },
+  };
+
+  const categories = [
+    { name: "Birthday Cakes", image: cake1, count: 25 },
+    { name: "Wedding Cakes", image: cake2, count: 18 },
+    { name: "Custom Cakes", image: cake3, count: 30 },
+    { name: "Cupcakes", image: cake4, count: 40 },
+  ];
+
+  return (
+    <div className="min-h-screen">
+      <section className="bg-linear-to-r from-[#FF673F] to-pink-600 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+              <h1 className="text-[43.32px] font-extrabold mb-6">
+                Order Your Cakes From Us Today!
+              </h1>
+              <p className="text-xl md:text-[26.77px] mb-8 text-pink-100">
+                Order quality meals made with love to be delivered right at you
+              </p>
+              <div className="flex space-x-4">
+                <Link
+                  to="/products"
+                  className="bg-white text-[#FF673F] px-8 py-3 rounded-full font-semibold hover:bg-pink-50 transition-colors"
+                >
+                  Shop Now
+                </Link>
+                <Link
+                  to="/about"
+                  className="border-2 border-white text-white px-8 py-3 rounded-full font-semibold hover:bg-white hover:text-[#FF673F] transition-colors"
+                >
+                  Learn More
+                </Link>
+              </div>
+            </div>
+            <div className="hidden md:block">
+              <img src={heroCake} alt="Delicious Cake" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="flex justify-center bg-black py-14">
+        <div className="flex flex-col gap-10 text-white">
+          <h2 className="text-2xl md:text-[40.06px] text-center font-bold">
+            Here’s What To Expect
+          </h2>
+          <div className="flex gap-5 md:gap-24">
+            <div className="flex flex-col items-center justify-center group">
+              <div className="w-20 h-20 sm:w-32 sm:h-32 rounded-full bg-[#FD5A2F] flex items-center justify-center mb-3">
+                <img
+                  src={halfCake}
+                  alt="Half Cake"
+                  className="w-10 h-10 md:w-auto md:h-auto"
+                />
+              </div>
+              <p className="text-center text-xs md:text-[15.92px] font-medium">
+                High Quality Cakes
+              </p>
+            </div>
+            <div className="flex flex-col items-center justify-center group">
+              <div className="w-20 h-20 sm:w-32 sm:h-32 rounded-full bg-[#FD5A2F] flex items-center justify-center mb-3">
+                <img
+                  src={sugar}
+                  alt="Sugar"
+                  className="w-10 h-10 md:w-auto md:h-auto"
+                />
+              </div>
+              <p className="text-center text-xs md:text-[15.92px] font-medium">
+                Natural Ingredients
+              </p>
+            </div>
+            <div className="flex flex-col items-center justify-center group">
+              <div className="w-20 h-20 sm:w-32 sm:h-32 rounded-full bg-[#FD5A2F] flex items-center justify-center mb-3">
+                <img
+                  src={cake}
+                  alt="Cake"
+                  className="w-10 h-10 md:w-auto md:h-auto"
+                />
+              </div>
+              <p className="text-center text-xs md:text-[15.92px] font-medium">
+                Beautiful Cakes
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-[#FF673F]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <h2 className="text-2xl md:text-[43.74px] text-white font-bold text-center mb-12">
+            Some Of Our Best Cakes
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {categories.map((category, index) => (
+              <Link
+                key={index}
+                to={`/products?category=${category.name}`}
+                className="text-white text-center group"
+              >
+                <img
+                  src={category.image}
+                  alt={category.name}
+                  className="h-40 md:h-80"
+                />
+                <h3 className="font-semibold text-lg mb-1 group-hover:text-pink-600 transition-colors">
+                  {category.name}
+                </h3>
+                <p className="text-gray-500 text-sm">{category.count} items</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-[43.74px] font-bold mb-4">
+            Start Your Order Here!
+          </h2>
+          <p className="text-lg md:text-[33.9px] font-light">
+            Choose How You Want Your Cake
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 mb-12">
+          <button
+            onClick={() => setSelectedOption("custom")}
+            className="group flex flex-col items-center focus:outline-none"
+          >
+            <div
+              className={`w-48 h-48 md:w-64 md:h-64 rounded-full bg-white shadow-lg flex items-center justify-center mb-6 group-hover:shadow-2xl transition-all duration-300 group-hover:scale-105 ${
+                selectedOption === "custom" ? "ring-4 ring-[#FF5722]" : ""
+              }`}
+            >
+              <img src={customCake} alt="Custom Cake" />
+            </div>
+            <h3
+              className={`text-xl md:text-2xl font-semibold transition-colors ${
+                selectedOption === "custom"
+                  ? "text-[#FF5722]"
+                  : "text-black group-hover:text-[#FF5722]"
+              }`}
+            >
+              Custom Cake
+            </h3>
+          </button>
+
+          <button
+            onClick={() => setSelectedOption("modify")}
+            className="group flex flex-col items-center focus:outline-none"
+          >
+            <div
+              className={`w-48 h-48 md:w-64 md:h-64 rounded-full bg-white shadow-xl flex items-center justify-center mb-6 group-hover:shadow-2xl transition-all duration-300 group-hover:scale-105 ${
+                selectedOption === "modify" ? "ring-4 ring-[#FF5722]" : ""
+              }`}
+            >
+              <img src={modifyCake} alt="Modify Cake" />
+            </div>
+            <h3
+              className={`text-xl md:text-2xl font-semibold transition-colors ${
+                selectedOption === "modify" ? "text-[#FF5722]" : "text-black"
+              }`}
+            >
+              Modify Cake
+            </h3>
+          </button>
+
+          {/* Ready Made Cakes Option */}
+          <button
+            onClick={() => setSelectedOption("readymade")}
+            className="group flex flex-col items-center focus:outline-none"
+          >
+            <div
+              className={`w-48 h-48 md:w-64 md:h-64 rounded-full bg-white shadow-lg flex items-center justify-center mb-6 group-hover:shadow-2xl transition-all duration-300 group-hover:scale-105 ${
+                selectedOption === "readymade" ? "ring-4 ring-[#FF5722]" : ""
+              }`}
+            >
+              <img src={readyMadeCake} alt="Ready Made Cake" />
+            </div>
+            <h3
+              className={`text-xl md:text-2xl font-semibold transition-colors ${
+                selectedOption === "readymade"
+                  ? "text-[#FF5722]"
+                  : "text-black group-hover:text-[#FF5722]"
+              }`}
+            >
+              Ready Made Cakes
+            </h3>
+          </button>
+        </div>
+
+        {selectedOption && (
+          <div className="max-w-4xl mx-auto text-center">
+            <h3 className="text-2xl md:text-3xl font-bold mb-4">
+              {orderOptions[selectedOption].title}
+            </h3>
+            <p className="text-base md:text-xl text-gray-700 mb-8 px-4">
+              {orderOptions[selectedOption].description}
+            </p>
+            <Link
+              to={orderOptions[selectedOption].route}
+              className="inline-block bg-[#FF5722] text-white px-16 py-4 rounded-full text-lg font-semibold hover:bg-[#E64A19] transition-colors shadow-lg"
+            >
+              Next
+            </Link>
+          </div>
+        )}
+      </section>
+
+      <section className="bg-black py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-16 text-white">
+            What Our Customer's Think
+          </h2>
+          <div className="grid md:grid-cols-3 gap-8 md:gap-12">
+            <div className="text-center">
+              <div className="mb-6">
+                <img
+                  src={alexa}
+                  className="w-24 h-24 md:w-32 md:h-32 rounded-full mx-auto object-cover border-4 border-white"
+                />
+              </div>
+              <h3 className="text-white font-bold text-lg md:text-xl mb-4">
+                Alexa B.
+              </h3>
+              <div className="flex justify-center gap-1 mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <svg
+                    key={i}
+                    className="w-6 h-6 md:w-8 md:h-8"
+                    viewBox="0 0 24 24"
+                    fill="#FF5722"
+                  >
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                  </svg>
+                ))}
+              </div>
+              <p className="text-white text-sm md:text-base leading-relaxed">
+                "I sent her a random Pinterest cake idea and somehow got
+                something even better. Everyone at the party asked for her
+                number!"
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="mb-6">
+                <img
+                  src={sarah}
+                  className="w-24 h-24 md:w-32 md:h-32 rounded-full mx-auto object-cover border-4 border-white"
+                />
+              </div>
+              <h3 className="text-white font-bold text-lg md:text-xl mb-4">
+                Sarah L.
+              </h3>
+              <div className="flex justify-center gap-1 mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <svg
+                    key={i}
+                    className="w-6 h-6 md:w-8 md:h-8"
+                    viewBox="0 0 24 24"
+                    fill="#FF5722"
+                  >
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                  </svg>
+                ))}
+              </div>
+              <p className="text-white text-sm md:text-base leading-relaxed">
+                "The chocolate cake was soft, rich, and perfect. My mum said it
+                reminded her of the one she had on her wedding day — 30 years
+                ago!"
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="mb-6">
+                <img
+                  src={damilola}
+                  alt="Damilola T."
+                  className="w-24 h-24 md:w-32 md:h-32 rounded-full mx-auto object-cover border-4 border-white"
+                />
+              </div>
+              <h3 className="text-white font-bold text-lg md:text-xl mb-4">
+                Damilola T.
+              </h3>
+              <div className="flex justify-center gap-1 mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <svg
+                    key={i}
+                    className="w-6 h-6 md:w-8 md:h-8"
+                    viewBox="0 0 24 24"
+                    fill="#FF5722"
+                  >
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                  </svg>
+                ))}
+              </div>
+              <p className="text-white text-sm md:text-base leading-relaxed">
+                "From booking to delivery, everything was seamless. Her
+                attention to detail is insane. I can't wait to order my wedding
+                cake!"
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <Footer />
+    </div>
+  );
 };
+
 export default Home;
