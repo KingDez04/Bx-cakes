@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import toast from "react-hot-toast";
+import bg from "../../../assets/authBackground.png";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -26,11 +27,14 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-pink-100 to-pink-50 flex items-center justify-center py-6 sm:py-12 px-4 sm:px-6 lg:px-8">
+    <div
+      className="font-secondary min-h-screen flex items-center justify-center py-6 sm:py-12 px-4 sm:px-6 lg:px-8"
+      style={{ backgroundImage: `url(${bg})` }}
+    >
       <div className="max-w-md w-full">
         <div className="bg-black text-white rounded-2xl sm:rounded-[31.25px] p-6 sm:p-8">
           <div className="text-center mb-6 sm:mb-8">
-            <h2 className="text-3xl sm:text-4xl lg:text-[41.54px] font-semibold text-[#FD5A2F] mb-2">
+            <h2 className="font-tertiary text-3xl sm:text-4xl lg:text-[41.54px] font-semibold text-[#FD5A2F] mb-2">
               Log In
             </h2>
             <p className="text-base sm:text-lg lg:text-[18.75px]">
@@ -123,7 +127,7 @@ const Login = () => {
 
             <button
               type="submit"
-              className="w-full bg-[#FD5A2F] text-white text-base sm:text-lg lg:text-[19.04px] py-2.5 sm:py-3 rounded-full sm:rounded-[33.6px] font-semibold hover:bg-pink-700 transition-colors focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2"
+              className="w-full bg-[#FD5A2F] text-white text-base sm:text-lg lg:text-[19.04px] py-2.5 sm:py-3 rounded-full sm:rounded-[33.6px] font-semibold hover:bg-pink-700 transition-colors focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 cursor-pointer"
             >
               Log In
             </button>
