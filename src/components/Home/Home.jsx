@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import Footer from "../Footer/Footer";
 import TopReviews from "../TopReviews/TopReviews";
+import bg from "../../assets/heading.png";
 import heroCake from "../../assets/cake3.png";
 import halfCake from "../../assets/halfCakeVector.png";
 import sugar from "../../assets/sugarVector.png";
@@ -47,12 +48,12 @@ const Home = () => {
   ];
 
   return (
-    <div className="min-h-screen">
-      <section className="bg-linear-to-r from-[#FF673F] to-pink-600 text-white">
+    <div className="font-tertiary min-h-screen">
+      <section className="text-white max-h-[503px]" style={{ backgroundImage: `url(${bg})` }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
-              <h1 className="text-[43.32px] font-extrabold mb-6">
+              <h1 className="font-secondary text-[43.32px] font-extrabold mb-6">
                 Order Your Cakes From Us Today!
               </h1>
               <p className="text-xl md:text-[26.77px] mb-8 text-pink-100">
@@ -82,7 +83,7 @@ const Home = () => {
 
       <section className="flex justify-center bg-black py-14">
         <div className="flex flex-col gap-10 text-white">
-          <h2 className="text-2xl md:text-[40.06px] text-center font-bold">
+          <h2 className="font-secondary text-2xl md:text-[40.06px] text-center font-bold">
             Here’s What To Expect
           </h2>
           <div className="flex gap-5 md:gap-24">
@@ -128,7 +129,7 @@ const Home = () => {
 
       <section className="bg-[#FF673F]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <h2 className="text-2xl md:text-[43.74px] text-white font-bold text-center mb-12">
+          <h2 className="font-secondary text-2xl md:text-[43.74px] text-white font-bold text-center mb-12">
             Some Of Our Best Cakes
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -155,7 +156,7 @@ const Home = () => {
 
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-[43.74px] font-bold mb-4">
+          <h2 className="font-secondary text-3xl md:text-[43.74px] font-bold mb-4">
             Start Your Order Here!
           </h2>
           <p className="text-lg md:text-[33.9px] font-light">
@@ -166,7 +167,7 @@ const Home = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 mb-12">
           <button
             onClick={() => setSelectedOption("custom")}
-            className="group flex flex-col items-center focus:outline-none"
+            className="group flex flex-col items-center focus:outline-none cursor-pointer"
           >
             <div
               className={`w-48 h-48 md:w-64 md:h-64 rounded-full bg-white shadow-lg flex items-center justify-center mb-6 group-hover:shadow-2xl transition-all duration-300 group-hover:scale-105 ${
@@ -188,7 +189,7 @@ const Home = () => {
 
           <button
             onClick={() => setSelectedOption("modify")}
-            className="group flex flex-col items-center focus:outline-none"
+            className="group flex flex-col items-center focus:outline-none cursor-pointer"
           >
             <div
               className={`w-48 h-48 md:w-64 md:h-64 rounded-full bg-white shadow-xl flex items-center justify-center mb-6 group-hover:shadow-2xl transition-all duration-300 group-hover:scale-105 ${
@@ -206,10 +207,9 @@ const Home = () => {
             </h3>
           </button>
 
-          {/* Ready Made Cakes Option */}
           <button
             onClick={() => setSelectedOption("readymade")}
-            className="group flex flex-col items-center focus:outline-none"
+            className="group flex flex-col items-center focus:outline-none cursor-pointer"
           >
             <div
               className={`w-48 h-48 md:w-64 md:h-64 rounded-full bg-white shadow-lg flex items-center justify-center mb-6 group-hover:shadow-2xl transition-all duration-300 group-hover:scale-105 ${
