@@ -66,7 +66,7 @@ const Contact = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-5xl font-bold mb-6">Contact Us</h1>
-            <p className="text-xl text-pink-100 max-w-2xl mx-auto">
+            <p className="text-xl max-w-2xl mx-auto">
               Have a question or want to place a custom order? We'd love to hear
               from you!
             </p>
@@ -87,7 +87,7 @@ const Contact = () => {
               <h3 className="font-semibold text-lg mb-3">{info.title}</h3>
               <div className="space-y-1">
                 {info.details.map((detail, idx) => (
-                  <p key={idx} className="text-gray-600">
+                  <p key={idx} className="text-white">
                     {info.action && idx === 0 ? (
                       <a
                         href={info.action}
