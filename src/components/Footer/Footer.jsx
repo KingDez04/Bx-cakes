@@ -61,7 +61,7 @@ const Footer = () => {
                   to="/readymade-cake"
                   className="text-gray-400 hover:text-[#FF673F] transition-colors"
                 >
-                  Products
+                  Cakes
                 </Link>
               </li>
               <li>
@@ -86,14 +86,6 @@ const Footer = () => {
           <div>
             <h4 className="text-lg font-semibold mb-4">Customer Service</h4>
             <ul className="space-y-2">
-              <li>
-                <Link
-                  to="/cart"
-                  className="text-gray-400 hover:text-[#FF673F] transition-colors"
-                >
-                  Shopping Cart
-                </Link>
-              </li>
               <li>
                 <Link
                   to="/profile"

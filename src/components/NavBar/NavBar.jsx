@@ -1,15 +1,12 @@
 import { Link, useNavigate } from "react-router-dom";
-import { ShoppingCart, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useState } from "react";
-import { useCart } from "../../context/CartContext";
 import bxLogo from "../../assets/bx-logo.png";
 import dp from "../../assets/staticDp.png";
 
 const NavBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { getCartCount } = useCart();
   const navigate = useNavigate();
-  const cartCount = getCartCount();
 
   const navLinks = [
     { name: "Home", path: "/" },
@@ -44,18 +41,6 @@ const NavBar = () => {
           </div>
 
           <div className="flex items-center space-x-4">
-            <button
-              onClick={() => navigate("/cart")}
-              className="relative lg:hidden p-2 hover:bg-gray-800 rounded-full transition-colors"
-            >
-              <ShoppingCart className="w-6 h-6 text-white" />
-              {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-[#FD5A2F] text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                  {cartCount}
-                </span>
-              )}
-            </button>
-
             <button
               onClick={() => navigate("/profile")}
               className="w-10 md:w-[73px] h-10 md:h-[73px] rounded-full overflow-hidden border-2 border-transparent hover:border-[#FD5A2F] transition-colors cursor-pointer"
