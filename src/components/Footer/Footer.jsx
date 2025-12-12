@@ -11,7 +11,7 @@ import logo from "../../assets/bx-logo.png";
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-900 text-white">
+    <footer className="font-main bg-gray-900 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
@@ -46,7 +46,7 @@ const Footer = () => {
           </div>
 
           <div>
-            <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
+            <h4 className="font-secondary text-lg font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-2">
               <li>
                 <Link
@@ -84,7 +84,7 @@ const Footer = () => {
           </div>
 
           <div>
-            <h4 className="text-lg font-semibold mb-4">Customer Service</h4>
+            <h4 className="font-secondary text-lg font-semibold mb-4">Customer Service</h4>
             <ul className="space-y-2">
               <li>
                 <Link
@@ -114,7 +114,7 @@ const Footer = () => {
           </div>
 
           <div>
-            <h4 className="text-lg font-semibold mb-4">Contact Us</h4>
+            <h4 className="font-secondary text-lg font-semibold mb-4">Contact Us</h4>
             <ul className="space-y-3">
               <li className="flex items-start space-x-3 text-gray-400">
                 <MapPin className="w-5 h-5 mt-1 shrink-0" />

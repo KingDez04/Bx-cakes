@@ -4,9 +4,9 @@ import damilola from "../../assets/damilola.png";
 
 const TopReviews = () => {
   return (
-    <div className="bg-black py-16">
+    <div className="font-tertiary bg-black py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-16 text-white">
+        <h2 className="font-secondary text-3xl md:text-4xl font-bold text-center mb-16 text-white">
           What Our Customer's Think
         </h2>
         <div className="grid md:grid-cols-3 gap-8 md:gap-12">
