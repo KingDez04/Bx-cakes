@@ -67,7 +67,7 @@ const ReadyMadeCakeCheckout = () => {
   const handleCheckout = () => {
     toast.success("Order placed successfully! We'll contact you shortly.");
     setTimeout(() => {
-      navigate("/readymade-cake");
+      navigate("/review-order");
     }, 2000);
   };
 
