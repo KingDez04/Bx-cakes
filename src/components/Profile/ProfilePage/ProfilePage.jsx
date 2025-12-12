@@ -23,7 +23,7 @@ const ProfilePage = () => {
     {
       icon: <Clock className="w-6 h-6" />,
       label: "Order History",
-      onClick: () => navigate("/orders"),
+      onClick: () => navigate("/order-history"),
     },
     {
       icon: <Settings className="w-6 h-6" />,
@@ -41,7 +41,7 @@ const ProfilePage = () => {
     {
       icon: <RotateCcw className="w-6 h-6" />,
       label: "Reorder A Previous Order",
-      onClick: () => navigate("/orders"),
+      onClick: () => navigate("/reorder-previous-order"),
     },
   ];
 
@@ -85,7 +85,7 @@ const ProfilePage = () => {
             <button
               key={index}
               onClick={button.onClick}
-              className="flex flex-col items-center justify-center group"
+              className="flex flex-col items-center justify-center group cursor-pointer"
             >
               <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-black text-[#FF5722] flex flex-col items-center justify-center mb-3 transition-transform hover:scale-105 shadow-lg">
                 {button.icon}
@@ -101,7 +101,7 @@ const ProfilePage = () => {
             <button
               key={index}
               onClick={button.onClick}
-              className="flex flex-col items-center justify-center group"
+              className="flex flex-col items-center justify-center group cursor-pointer"
             >
               <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-black text-[#FF5722] flex flex-col items-center justify-center mb-3 transition-transform hover:scale-105 shadow-lg">
                 {button.icon}
