@@ -36,7 +36,7 @@ const ProfilePage = () => {
     {
       icon: <Plus className="w-6 h-6" />,
       label: "Start A New Order",
-      onClick: () => navigate("/products"),
+      onClick: () => navigate("/readymade-cake"),
     },
     {
       icon: <RotateCcw className="w-6 h-6" />,
