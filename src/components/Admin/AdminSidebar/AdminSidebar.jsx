@@ -44,7 +44,11 @@ const AdminSidebar = ({ onToggle }) => {
       label: "Ready Made Cakes",
     },
     { path: "/admin/order-history", icon: FileText, label: "Order History" },
-    { path: "/admin/customs-upload", icon: Upload, label: "Customs Upload" },
+    {
+      path: "/admin/customer-uploads",
+      icon: Upload,
+      label: "Customer Uploads",
+    },
   ];
 
   const isActive = (path) => {
