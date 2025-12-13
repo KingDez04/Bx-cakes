@@ -4,6 +4,8 @@ import { ArrowLeft } from "lucide-react";
 import toast from "react-hot-toast";
 import Footer from "../Footer/Footer";
 import TopReviews from "../TopReviews/TopReviews";
+import bg from "../../assets/heading2.png";
+import bg2 from "../../assets/heading4.png";
 import rectCake from "../../assets/rectangleCake.png";
 import sqrCake from "../../assets/squareCake.png";
 import circleCake from "../../assets/circleCake.png";
@@ -455,8 +457,14 @@ const ModifyCakeCustomize = () => {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-red-950 via-black to-red-950">
-      <div className="bg-linear-to-r from-orange-800 via-black to-orange-800 py-12 px-4">
+    <div
+      className="font-secondary min-h-screen bg-linear-to-br "
+      style={{ backgroundImage: `url(${bg})` }}
+    >
+      <div
+        className="py-16 px-4"
+        style={{ backgroundImage: `url(${bg2})` }}
+      >
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
             Modify A Cake

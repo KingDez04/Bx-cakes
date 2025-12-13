@@ -4,6 +4,8 @@ import { ArrowLeft } from "lucide-react";
 import { Toaster, toast } from "react-hot-toast";
 import TopReviews from "../TopReviews/TopReviews";
 import Footer from "../Footer/Footer";
+import bg from "../../assets/heading1.png";
+import bg2 from "../../assets/heading2.png";
 import pickupImg from "../../assets/pickup.png";
 import deliveryImg from "../../assets/doorStep.png";
 
@@ -74,15 +76,21 @@ const ReadyMadeCakeCheckout = () => {
   const stepIndicators = [1, 2, 3, 4, 5, 6, 7];
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-red-950 via-black to-red-950">
+    <div
+      className="font-secondary min-h-screen"
+      style={{ backgroundImage: `url(${bg2})` }}
+    >
       <Toaster position="top-center" />
 
-      <div className="bg-linear-to-r from-orange-800 via-black to-orange-800 py-12 px-4">
+      <div
+        className="bg-linear-to-r py-16 px-4"
+        style={{ backgroundImage: `url(${bg})` }}
+      >
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
             Ready made cake
           </h1>
-          <p className="text-white text-base md:text-lg max-w-2xl mx-auto">
+          <p className="text-white text-base md:text-[27.03px] max-w-2xl mx-auto">
             Not sure what design to choose? Don't worry—we can help! You can
             even customize our previous creations to fit your style and taste.
           </p>

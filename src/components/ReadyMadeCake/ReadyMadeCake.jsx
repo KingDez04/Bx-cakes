@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Star, Search } from "lucide-react";
 import TopReviews from "../TopReviews/TopReviews";
 import Footer from "../Footer/Footer";
+import bg from "../../assets/heading4.png";
 
 // Currency conversion rate (example: 1 USD = 1600 NGN)
 const USD_TO_NGN = 1600;
@@ -124,13 +125,13 @@ const ReadyMadeCake = () => {
   });
 
   return (
-    <div className="min-h-screen">
-      <div className="bg-linear-to-r from-orange-800 via-black to-orange-800 py-12 px-4">
-        <div className="max-w-7xl mx-auto text-center">
+    <div className="font-tertiary min-h-screen">
+      <div className="py-16 px-4" style={{ backgroundImage: `url(${bg})` }}>
+        <div className="font-secondary max-w-7xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
             Purchase A Ready Made Cake
           </h1>
-          <p className="text-white text-base md:text-lg max-w-2xl mx-auto">
+          <p className="text-white text-base md:text-[27.03px] max-w-2xl mx-auto">
             Want an already made cake? SHop from our catalog
           </p>
         </div>

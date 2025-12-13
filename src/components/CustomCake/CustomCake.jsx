@@ -8,6 +8,8 @@ import {
 import toast from "react-hot-toast";
 import Footer from "../Footer/Footer";
 import TopReviews from "../TopReviews/TopReviews";
+import bg from "../../assets/heading1.png";
+import bg2 from "../../assets/heading2.png";
 import rectCake from "../../assets/rectangleCake.png";
 import sqrCake from "../../assets/squareCake.png";
 import circleCake from "../../assets/circleCake.png";
@@ -745,18 +747,14 @@ const CustomCake = () => {
 
   return (
     <div
-      className={`min-h-screen ${
-        isConfirmPage
-          ? "bg-white"
-          : "bg-linear-to-br from-[#8B4513] via-black to-[#D2691E]"
-      }`}
+      className={`font-secondary min-h-screen ${isConfirmPage && "bg-white"}`} style={{ backgroundImage: `url(${bg2})` }}
     >
-      <div className="bg-linear-to-br from-[#8B4513] via-[#A0522D] to-[#D2691E] py-6 md:py-8">
+      <div className="py-6 md:py-16" style={{ backgroundImage: `url(${bg})` }}>
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-2xl md:text-4xl font-bold text-white">
+          <h1 className="text-2xl md:text-[43.74px] font-bold text-white">
             Customize A Cake
           </h1>
-          <p className="text-sm md:text-base text-white/90 mt-2 max-w-3xl mx-auto">
+          <p className="text-sm md:text-[27.03px] text-white/90 mt-2 max-w-3xl mx-auto">
             Not sure what design to choose? Don't worry—we can help! You can
             even customize our previous creations to fit your style and taste.
           </p>

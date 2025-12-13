@@ -76,7 +76,7 @@ const ReadyMadeCakeDetails = () => {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="font-tertiary min-h-screen">
       <div className="py-12 px-4">
         <div className="max-w-7xl mx-auto">
           <button
@@ -104,7 +104,7 @@ const ReadyMadeCakeDetails = () => {
               <p className="text-orange-600 font-semibold mb-2">
                 {product.category}
               </p>
-              <h1 className="text-3xl font-bold mb-4 text-gray-900">
+              <h1 className="font-secondary text-3xl font-bold mb-4 text-gray-900">
                 {product.name}
               </h1>
 
@@ -200,7 +200,9 @@ const ReadyMadeCakeDetails = () => {
         </div>
 
         <section className="mb-12">
-          <h2 className="text-2xl font-bold mb-6">You May Also Like</h2>
+          <h2 className="font-secondary text-2xl font-bold mb-6">
+            Other Cakes You Might Like
+          </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {relatedProducts.map((relatedProduct) => (
               <div

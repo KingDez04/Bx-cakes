@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
 import Footer from "../Footer/Footer";
 import TopReviews from "../TopReviews/TopReviews";
+import bg2 from "../../assets/heading4.png";
 
 const ModifyCake = () => {
   const navigate = useNavigate();
@@ -143,12 +144,12 @@ const ModifyCake = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-linear-to-r from-orange-900 via-black to-orange-900 py-16 px-4">
+      <div className="py-16 px-4" style={{ backgroundImage: `url(${bg2})` }}>
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
             Modify A Cake
           </h1>
-          <p className="text-white text-base md:text-lg max-w-2xl mx-auto">
+          <p className="text-white text-base md:text-[27.03px] max-w-2xl mx-auto">
             Not sure what design to choose? Don't worry—we can help! You can
             even customize our previous creations to fit your style and taste.
           </p>
@@ -330,34 +331,34 @@ const ModifyCake = () => {
           </button>
         </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            {filteredCakes.map((cake) => (
-              <button
-                key={cake.id}
-                onClick={() => handleCakeClick(cake)}
-                className="aspect-square rounded-lg overflow-hidden hover:opacity-80 transition-opacity cursor-pointer"
-              >
-                <img
-                  src={cake.image}
-                  alt={cake.name}
-                  className="w-full h-full object-cover"
-                />
-              </button>
-            ))}
-          </div>
-
-          <div className="text-center space-y-4">
-            <p className="text-lg font-semibold">
-              Didn't Find Anything You Like?
-            </p>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          {filteredCakes.map((cake) => (
             <button
-              onClick={() => navigate("/customize-cake")}
-              className="bg-[#FF5722] hover:bg-[#FF5722]/90 text-white px-8 py-3 rounded-full font-medium transition-colors"
+              key={cake.id}
+              onClick={() => handleCakeClick(cake)}
+              className="aspect-square rounded-lg overflow-hidden hover:opacity-80 transition-opacity cursor-pointer"
             >
-              Customize Your Cake
+              <img
+                src={cake.image}
+                alt={cake.name}
+                className="w-full h-full object-cover"
+              />
             </button>
-          </div>
+          ))}
         </div>
+
+        <div className="text-center space-y-4">
+          <p className="text-lg font-semibold">
+            Didn't Find Anything You Like?
+          </p>
+          <button
+            onClick={() => navigate("/customize-cake")}
+            className="bg-[#FF5722] hover:bg-[#FF5722]/90 text-white px-8 py-3 rounded-full font-medium transition-colors"
+          >
+            Customize Your Cake
+          </button>
+        </div>
+      </div>
 
       {showModal && selectedCake && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">

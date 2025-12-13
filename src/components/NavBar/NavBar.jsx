@@ -17,7 +17,7 @@ const NavBar = () => {
   ];
 
   return (
-    <nav className="bg-black sticky top-0 z-50">
+    <nav className="font-main bg-black sticky top-0 z-50">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
         <div className="flex justify-between items-center h-[104px]">
           <Link to="/" className="flex items-center">
@@ -50,7 +50,7 @@ const NavBar = () => {
 
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="lg:hidden p-2 hover:bg-gray-800 rounded-lg transition-colors"
+              className="lg:hidden p-2 hover:bg-gray-800 rounded-lg transition-colors cursor-pointer"
             >
               {isMenuOpen ? (
                 <X className="w-6 h-6 text-white" />

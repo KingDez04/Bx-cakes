@@ -43,8 +43,7 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Orange Header Section */}
+    <div className="font-main min-h-screen bg-white">
       <div className="bg-[#FF5722] pt-16 pb-24 px-4 h-[391px] -mb-[17%] md:-mb-[7%]"></div>
       <div className="max-w-4xl mx-auto text-center">
         <div className="relative inline-block mb-6">
@@ -64,7 +63,7 @@ const ProfilePage = () => {
         </div>
 
         <div className="flex items-center justify-center gap-2 mb-2">
-          <h1 className="text-4xl md:text-[54.23px] font-bold text-black mb-2">
+          <h1 className="font-secondary text-4xl md:text-[54.23px] font-bold text-black mb-2">
             {formData.name}
           </h1>
           <button
@@ -81,7 +80,7 @@ const ProfilePage = () => {
           <form onSubmit={handleSave} className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-32 gap-y-6 mb-10">
               <div>
-                <label className="block text-[18.68px] font-semibold text-black mb-3">
+                <label className="font-tertiary block text-[18.68px] font-semibold text-black mb-3">
                   Your Address
                 </label>
                 <input
@@ -94,7 +93,7 @@ const ProfilePage = () => {
               </div>
 
               <div>
-                <label className="block text-[18.68px] font-semibold text-black mb-3">
+                <label className="font-tertiary block text-[18.68px] font-semibold text-black mb-3">
                   Personal Order Note
                 </label>
                 <input
@@ -109,7 +108,7 @@ const ProfilePage = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-32 gap-y-6 mb-20">
               <div>
-                <label className="block text-[18.68px] font-semibold text-black mb-3">
+                <label className="font-tertiary block text-[18.68px] font-semibold text-black mb-3">
                   Phone Number
                 </label>
                 <input

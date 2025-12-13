@@ -108,7 +108,7 @@ const OrderHistory = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="font-main min-h-screen bg-gray-100">
       <div className="max-w-7xl mx-auto p-6">
         <div className="flex items-center gap-4 mb-6">
           <button
@@ -117,7 +117,7 @@ const OrderHistory = () => {
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-2xl font-bold">Cake Order History</h1>
+          <h1 className="font-secondary text-2xl font-bold">Cake Order History</h1>
         </div>
 
         <div className="flex gap-3 mb-6">

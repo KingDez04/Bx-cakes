@@ -46,7 +46,7 @@ const ProfilePage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="font-main min-h-screen bg-white">
       {/* Orange Header Section */}
       <div className="bg-[#FF5722] pt-16 pb-24 px-4 h-[391px] -mb-[17%] md:-mb-[7%]"></div>
       <div className="max-w-4xl mx-auto text-center">
@@ -60,7 +60,7 @@ const ProfilePage = () => {
           </div>
         </div>
 
-        <h1 className="text-4xl font-bold text-black mb-2">{userData.name}</h1>
+        <h1 className="font-secondary text-4xl font-bold text-black mb-2">{userData.name}</h1>
         <p className="text-lg text-black">{userData.email}</p>
       </div>
 

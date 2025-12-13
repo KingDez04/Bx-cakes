@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Mail, Phone, MapPin, Clock, Send } from "lucide-react";
 import TopReviews from "../TopReviews/TopReviews";
 import Footer from "../Footer/Footer";
+import bg from "../../assets/heading1.png";
+import bg2 from "../../assets/heading2.png";
 import toast from "react-hot-toast";
 
 const Contact = () => {
@@ -61,12 +63,18 @@ const Contact = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-[#8B4513] via-black to-[#D2691E]">
-      <section className="bg-linear-to-r from-orange-800 via-black to-orange-800 text-white py-20">
+    <div
+      className="font-secondary min-h-screen"
+      style={{ backgroundImage: `url(${bg2})` }}
+    >
+      <section
+        className="text-white py-20"
+        style={{ backgroundImage: `url(${bg})` }}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-5xl font-bold mb-6">Contact Us</h1>
-            <p className="text-xl max-w-2xl mx-auto">
+            <p className="text-xl md:text-[27.03px] max-w-2xl mx-auto">
               Have a question or want to place a custom order? We'd love to hear
               from you!
             </p>

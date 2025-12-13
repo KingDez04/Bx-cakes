@@ -32,7 +32,7 @@ const EditAndReorder = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="font-main min-h-screen bg-gray-100">
       <div className="max-w-7xl mx-auto p-6">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
@@ -42,7 +42,7 @@ const EditAndReorder = () => {
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
-            <h1 className="text-2xl font-bold">Edit and Reorder</h1>
+            <h1 className="font-secondary text-2xl font-bold">Edit and Reorder</h1>
           </div>
           <button
             onClick={handleProceedToOrder}
@@ -62,7 +62,7 @@ const EditAndReorder = () => {
             />
           </div>
           <div className="bg-white rounded-lg p-6">
-            <h2 className="text-xl font-bold mb-6">Cake Information</h2>
+            <h2 className="font-secondary text-xl font-bold mb-6">Cake Information</h2>
 
             <div className="space-y-4">
               <div>

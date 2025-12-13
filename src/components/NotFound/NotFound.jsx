@@ -5,11 +5,11 @@ const NotFound = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="font-tertiary min-h-screen bg-white">
       <div className="bg-[#FF5722] pt-20 pb-32 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <div className="mb-8">
-            <h1 className="text-[120px] md:text-[180px] font-bold text-black leading-none">
+            <h1 className="font-secondary text-[120px] md:text-[180px] font-bold text-black leading-none">
               404
             </h1>
           </div>

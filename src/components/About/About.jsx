@@ -1,6 +1,7 @@
 import { Award, Heart, Users, Clock } from "lucide-react";
 import TopReviews from "../TopReviews/TopReviews";
 import Footer from "../Footer/Footer";
+import bg from "../../assets/heading.png";
 
 const About = () => {
   const values = [
@@ -52,11 +53,16 @@ const About = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <section className="bg-[#FD5A2F] text-white py-20">
+    <div className="font-tertiary min-h-screen bg-gray-50">
+      <section
+        className="text-white py-20"
+        style={{ backgroundImage: `url(${bg})` }}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-5xl font-bold mb-6">About Bx Cakes</h1>
+            <h1 className="font-secondary text-5xl font-bold mb-6">
+              About Bx Cakes
+            </h1>
             <p className="text-xl text-pink-100 max-w-3xl mx-auto">
               Creating sweet memories since 2015. We're passionate about baking
               the perfect cake for every celebration.
@@ -65,11 +71,12 @@ const About = () => {
         </div>
       </section>
 
-      {/* Our Story */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div>
-            <h2 className="text-3xl font-bold mb-6">Our Story</h2>
+            <h2 className="font-secondary text-3xl font-bold mb-6">
+              Our Story
+            </h2>
             <div className="space-y-4 text-gray-700">
               <p>
                 Bx Cakes began as a small home bakery with a simple mission: to
@@ -108,7 +115,9 @@ const About = () => {
 
       <section className="bg-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center mb-12">Our Values</h2>
+          <h2 className="font-secondary text-3xl font-bold text-center mb-12">
+            Our Values
+          </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {values.map((value, index) => (
               <div key={index} className="text-center">
@@ -124,7 +133,9 @@ const About = () => {
       </section>
 
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <h2 className="text-3xl font-bold text-center mb-12">Meet Our Team</h2>
+        <h2 className="font-secondary text-3xl font-bold text-center mb-12">
+          Meet Our Team
+        </h2>
         <div className="grid md:grid-cols-3 gap-8">
           {team.map((member, index) => (
             <div
@@ -172,7 +183,9 @@ const About = () => {
 
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="bg-white rounded-xl shadow-lg p-12 text-center">
-          <h2 className="text-3xl font-bold mb-6">Our Mission</h2>
+          <h2 className="font-secondary text-3xl font-bold mb-6">
+            Our Mission
+          </h2>
           <p className="text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
             "To create unforgettable moments by crafting exceptional cakes that
             bring joy, celebrate life's special occasions, and exceed our

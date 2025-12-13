@@ -26,9 +26,9 @@ const ReviewOrder = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+    <div className="font-main min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-lg p-8 max-w-3xl w-full">
-        <h1 className="text-3xl font-bold text-center mb-6">
+        <h1 className="font-secondary text-3xl font-bold text-center mb-6">
           How Was Your Last Order?
         </h1>
 
