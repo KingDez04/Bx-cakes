@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Edit } from "lucide-react";
+import toast from "react-hot-toast";
 import dp from "../../../assets/staticDp.png";
 
-const ProfilePage = () => {
+const EditProfile = () => {
   const navigate = useNavigate();
 
   // user data from context/API
@@ -144,4 +145,4 @@ const ProfilePage = () => {
   );
 };
 
-export default ProfilePage;
+export default EditProfile;

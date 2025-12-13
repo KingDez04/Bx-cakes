@@ -41,8 +41,8 @@ const AdminAddReadyMadeCake = () => {
   };
 
   const handleSubmit = () => {
-    console.log("Form data:", { ...formData, quantity });
-    // Handle form submission
+    // TODO: Handle form submission - send data to backend API
+    // const formDataToSubmit = { ...formData, quantity };
   };
 
   return (

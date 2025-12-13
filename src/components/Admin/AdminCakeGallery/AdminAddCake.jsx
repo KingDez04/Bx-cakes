@@ -32,8 +32,8 @@ const AdminAddCake = () => {
   };
 
   const handleSubmit = () => {
-    // Handle form submission
-    console.log("Form data:", formData);
+    // TODO: Handle form submission - send data to backend API
+    // await addCakeToGallery(formData);
   };
 
   return (

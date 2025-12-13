@@ -77,12 +77,14 @@ const AdminCakeReview = () => {
   ];
 
   const handleApprove = () => {
-    console.log("Approved order:", selectedOrder);
+    // TODO: Send approval to backend API
+    // await approveOrder(selectedOrder.id);
     setSelectedOrder(null);
   };
 
   const handleDecline = () => {
-    console.log("Declined order:", selectedOrder);
+    // TODO: Send decline to backend API
+    // await declineOrder(selectedOrder.id);
     setSelectedOrder(null);
   };
 

@@ -17,7 +17,7 @@ const ReviewOrder = () => {
 
   const handleSubmit = () => {
     // Handle review submission
-    console.log({ rating, customerNote });
+    // TODO: Send review data to backend API
     navigate("/order-history");
   };
 
