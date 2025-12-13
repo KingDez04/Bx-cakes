@@ -13,7 +13,7 @@ import cake3 from "../../assets/cake6.png";
 import cake4 from "../../assets/cake2.png";
 import customCake from "../../assets/customCake.png";
 import modifyCake from "../../assets/modifyCake.png";
-import readyMadeCake from "../../assets/readyMadeCake.png";
+import readyMadeCake from "../../assets/readymadeCake.png";
 
 const Home = () => {
   const [selectedOption, setSelectedOption] = useState(null);

@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Edit, Clock, Settings, Plus, RotateCcw } from "lucide-react";
+import bg from "../../../assets/heading.png";
 import dp from "../../../assets/staticDp.png";
 
 const ProfilePage = () => {
@@ -47,8 +48,10 @@ const ProfilePage = () => {
 
   return (
     <div className="font-main min-h-screen bg-white">
-      {/* Orange Header Section */}
-      <div className="bg-[#FF5722] pt-16 pb-24 px-4 h-[391px] -mb-[17%] md:-mb-[7%]"></div>
+      <div
+        className="pt-16 pb-24 px-4 h-[391px] -mb-[17%] md:-mb-[7%]"
+        style={{ backgroundImage: `url(${bg})` }}
+      ></div>
       <div className="max-w-4xl mx-auto text-center">
         <div className="relative inline-block mb-6">
           <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-[#4A6B8A] bg-[#4A6B8A] mx-auto">
@@ -60,7 +63,9 @@ const ProfilePage = () => {
           </div>
         </div>
 
-        <h1 className="font-secondary text-4xl font-bold text-black mb-2">{userData.name}</h1>
+        <h1 className="font-secondary text-4xl font-bold text-black mb-2">
+          {userData.name}
+        </h1>
         <p className="text-lg text-black">{userData.email}</p>
       </div>
 

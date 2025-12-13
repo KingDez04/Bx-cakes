@@ -18,6 +18,7 @@ import Signup from "./components/Authentication/Signup/Signup";
 import PasswordReset from "./components/Authentication/PasswordReset/PasswordReset";
 import ProfilePage from "./components/Profile/ProfilePage/ProfilePage";
 import EditProfile from "./components/Profile/EditProfile/EditProfile";
+import Settings from "./components/Profile/Settings/Settings";
 import CustomCake from "./components/CustomCake/CustomCake";
 import AdminHome from "./components/Admin/AdminHome/AdminHome";
 import AdminCakeGallery from "./components/Admin/AdminCakeGallery/AdminCakeGallery";
@@ -76,6 +77,7 @@ const App = () => {
         <Route path="/passwordReset" element={<PasswordReset />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/editProfile" element={<EditProfile />} />
+        <Route path="/settings" element={<Settings />} />
         <Route path="/customize-cake" element={<CustomCake />} />
 
         <Route path="/modify-cake" element={<ModifyCake />} />
