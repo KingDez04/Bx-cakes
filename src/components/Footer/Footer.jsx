@@ -10,6 +10,10 @@ import {
 import logo from "../../assets/bx-logo.png";
 
 const Footer = () => {
+  const handleLinkClick = () => {
+    window.scrollTo(0, 0);
+  };
+
   return (
     <footer className="font-main bg-gray-900 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -46,11 +50,14 @@ const Footer = () => {
           </div>
 
           <div>
-            <h4 className="font-secondary text-lg font-semibold mb-4">Quick Links</h4>
+            <h4 className="font-secondary text-lg font-semibold mb-4">
+              Quick Links
+            </h4>
             <ul className="space-y-2">
               <li>
                 <Link
                   to="/"
+                  onClick={handleLinkClick}
                   className="text-gray-400 hover:text-[#FF673F] transition-colors"
                 >
                   Home
@@ -59,6 +66,7 @@ const Footer = () => {
               <li>
                 <Link
                   to="/readymade-cake"
+                  onClick={handleLinkClick}
                   className="text-gray-400 hover:text-[#FF673F] transition-colors"
                 >
                   Cakes
@@ -67,6 +75,7 @@ const Footer = () => {
               <li>
                 <Link
                   to="/about"
+                  onClick={handleLinkClick}
                   className="text-gray-400 hover:text-[#FF673F] transition-colors"
                 >
                   About Us
@@ -75,6 +84,7 @@ const Footer = () => {
               <li>
                 <Link
                   to="/contact"
+                  onClick={handleLinkClick}
                   className="text-gray-400 hover:text-[#FF673F] transition-colors"
                 >
                   Contact
@@ -84,11 +94,14 @@ const Footer = () => {
           </div>
 
           <div>
-            <h4 className="font-secondary text-lg font-semibold mb-4">Customer Service</h4>
+            <h4 className="font-secondary text-lg font-semibold mb-4">
+              Customer Service
+            </h4>
             <ul className="space-y-2">
               <li>
                 <Link
                   to="/profile"
+                  onClick={handleLinkClick}
                   className="text-gray-400 hover:text-[#FF673F] transition-colors"
                 >
                   My Account
@@ -114,7 +127,9 @@ const Footer = () => {
           </div>
 
           <div>
-            <h4 className="font-secondary text-lg font-semibold mb-4">Contact Us</h4>
+            <h4 className="font-secondary text-lg font-semibold mb-4">
+              Contact Us
+            </h4>
             <ul className="space-y-3">
               <li className="flex items-start space-x-3 text-gray-400">
                 <MapPin className="w-5 h-5 mt-1 shrink-0" />

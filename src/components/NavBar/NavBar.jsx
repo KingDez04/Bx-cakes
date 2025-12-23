@@ -8,6 +8,11 @@ const NavBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
 
+  const handleLinkClick = () => {
+    window.scrollTo(0, 0);
+    setIsMenuOpen(false);
+  };
+
   const navLinks = [
     { name: "Home", path: "/" },
     { name: "About us", path: "/about" },
@@ -20,7 +25,7 @@ const NavBar = () => {
     <nav className="font-main bg-black sticky top-0 z-50">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
         <div className="flex justify-between items-center h-[104px]">
-          <Link to="/" className="flex items-center">
+          <Link to="/" onClick={handleLinkClick} className="flex items-center">
             <img
               src={bxLogo}
               alt="BX Cakes Logo"
@@ -33,6 +38,7 @@ const NavBar = () => {
               <Link
                 key={link.path}
                 to={link.path}
+                onClick={handleLinkClick}
                 className="text-white hover:text-[#FD5A2F] transition-colors text-[18px] font-normal whitespace-nowrap"
               >
                 {link.name}
@@ -68,7 +74,7 @@ const NavBar = () => {
                 <Link
                   key={link.path}
                   to={link.path}
-                  onClick={() => setIsMenuOpen(false)}
+                  onClick={handleLinkClick}
                   className="text-white hover:text-[#FD5A2F] hover:bg-gray-900 px-4 py-3 rounded-lg transition-colors text-base"
                 >
                   {link.name}
