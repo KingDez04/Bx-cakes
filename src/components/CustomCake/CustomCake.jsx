@@ -294,7 +294,7 @@ const CustomCake = () => {
             <div className="flex flex-col items-center">
               <button
                 onClick={incrementTiers}
-                className="text-white hover:text-[#FF5722] transition mb-2"
+                className="text-white hover:text-[#FF5722] transition mb-2 cupsor-pointer"
               >
                 <ChevronUp className="w-6 h-6 sm:w-8 sm:h-8" />
               </button>
@@ -303,7 +303,7 @@ const CustomCake = () => {
               </div>
               <button
                 onClick={decrementTiers}
-                className="text-white hover:text-[#FF5722] transition mt-2"
+                className="text-white hover:text-[#FF5722] transition mt-2 cupsor-pointer"
               >
                 <ChevronDown className="w-6 h-6 sm:w-8 sm:h-8" />
               </button>
@@ -441,71 +441,132 @@ const CustomCake = () => {
                   </div>
                 ))}
 
-                <div className="space-y-3 mt-8">
-                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
-                    <label className="text-white font-semibold w-full sm:w-20 text-sm md:text-base">
-                      Height
-                    </label>
-                    <div className="flex gap-2 flex-wrap">
-                      {["4 inches", "6 inches", "8 inches"].map((size) => (
+                <div className="mt-8">
+                  <p className="text-white text-sm mb-4 text-center">
+                    All measurements are in inches
+                  </p>
+                  <div className="flex flex-row gap-4 sm:gap-6 md:gap-8 items-start justify-center">
+                    <div className="flex flex-col items-center">
+                      <label className="text-white font-semibold mb-2 text-xs sm:text-sm md:text-base">
+                        Height
+                      </label>
+                      <div className="flex flex-col items-center">
                         <button
-                          key={size}
-                          onClick={() =>
-                            updateTierSize(tierIndex, "height", size)
-                          }
-                          className={`px-4 sm:px-6 py-2 rounded-full font-semibold transition text-xs sm:text-sm md:text-base ${
-                            tier.size?.height === size
-                              ? "bg-[#FF5722] text-white"
-                              : "bg-white text-black"
-                          }`}
+                          onClick={() => {
+                            const currentValue =
+                              parseInt(tier.size?.height) || 2;
+                            updateTierSize(
+                              tierIndex,
+                              "height",
+                              currentValue + 1
+                            );
+                          }}
+                          className="text-white hover:text-[#FF5722] p-1 rounded-t-full transition cursor-pointer"
                         >
-                          {size}
+                          <ChevronUp className="w-3 h-3 sm:w-8 sm:h-8" />
                         </button>
-                      ))}
+                        <div className="bg-white rounded-full text-black px-4 sm:px-6 py-1.5 sm:py-2 text-center font-bold text-lg sm:text-xl">
+                          {tier.size?.height || 2}
+                        </div>
+                        <button
+                          onClick={() => {
+                            const currentValue =
+                              parseInt(tier.size?.height) || 2;
+                            if (currentValue > 1) {
+                              updateTierSize(
+                                tierIndex,
+                                "height",
+                                currentValue - 1
+                              );
+                            }
+                          }}
+                          className="text-white hover:text-[#FF5722] p-1 rounded-full transition cursor-pointer"
+                        >
+                          <ChevronDown className="w-3 h-3 sm:w-8 sm:h-8" />
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
-                    <label className="text-white font-semibold w-full sm:w-20 text-sm md:text-base">
-                      Width
-                    </label>
-                    <div className="flex gap-2 flex-wrap">
-                      {["4 inches", "6 inches", "8 inches"].map((size) => (
+
+                    <div className="flex flex-col items-center">
+                      <label className="text-white font-semibold mb-2 text-xs sm:text-sm md:text-base">
+                        Width
+                      </label>
+                      <div className="flex flex-col items-center">
                         <button
-                          key={size}
-                          onClick={() =>
-                            updateTierSize(tierIndex, "width", size)
-                          }
-                          className={`px-4 sm:px-6 py-2 rounded-full font-semibold transition text-xs sm:text-sm md:text-base ${
-                            tier.size?.width === size
-                              ? "bg-[#FF5722] text-white"
-                              : "bg-white text-black"
-                          }`}
+                          onClick={() => {
+                            const currentValue =
+                              parseInt(tier.size?.width) || 2;
+                            updateTierSize(
+                              tierIndex,
+                              "width",
+                              currentValue + 1
+                            );
+                          }}
+                          className="text-white hover:text-[#FF5722] p-1 rounded-full transition cursor-pointer"
                         >
-                          {size}
+                          <ChevronUp className="w-3 h-3 sm:w-8 sm:h-8" />
                         </button>
-                      ))}
+                        <div className="bg-white rounded-full text-black px-4 sm:px-6 py-1.5 sm:py-2 text-center font-bold text-lg sm:text-xl">
+                          {tier.size?.width || 2}
+                        </div>
+                        <button
+                          onClick={() => {
+                            const currentValue =
+                              parseInt(tier.size?.width) || 2;
+                            if (currentValue > 1) {
+                              updateTierSize(
+                                tierIndex,
+                                "width",
+                                currentValue - 1
+                              );
+                            }
+                          }}
+                          className="text-white hover:text-[#FF5722] p-1 rounded-t-full transition cursor-pointer"
+                        >
+                          <ChevronDown className="w-3 h-3 sm:w-8 sm:h-8" />
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
-                    <label className="text-white font-semibold w-full sm:w-20 text-sm md:text-base">
-                      Length
-                    </label>
-                    <div className="flex gap-2 flex-wrap">
-                      {["4 inches", "6 inches", "8 inches"].map((size) => (
+
+                    <div className="flex flex-col items-center">
+                      <label className="text-white font-semibold mb-2 text-xs sm:text-sm md:text-base">
+                        Length
+                      </label>
+                      <div className="flex flex-col items-center">
                         <button
-                          key={size}
-                          onClick={() =>
-                            updateTierSize(tierIndex, "length", size)
-                          }
-                          className={`px-4 sm:px-6 py-2 rounded-full font-semibold transition text-xs sm:text-sm md:text-base ${
-                            tier.size?.length === size
-                              ? "bg-[#FF5722] text-white"
-                              : "bg-white text-black"
-                          }`}
+                          onClick={() => {
+                            const currentValue =
+                              parseInt(tier.size?.length) || 2;
+                            updateTierSize(
+                              tierIndex,
+                              "length",
+                              currentValue + 1
+                            );
+                          }}
+                          className="text-white hover:text-[#FF5722] p-1 rounded-full transition cursor-pointer"
                         >
-                          {size}
+                          <ChevronUp className="w-3 h-3 sm:w-8 sm:h-8" />
                         </button>
-                      ))}
+                        <div className="bg-white rounded-full text-black px-4 sm:px-6 py-1.5 sm:py-2 text-center font-bold text-lg sm:text-xl">
+                          {tier.size?.length || 2}
+                        </div>
+                        <button
+                          onClick={() => {
+                            const currentValue =
+                              parseInt(tier.size?.length) || 2;
+                            if (currentValue > 1) {
+                              updateTierSize(
+                                tierIndex,
+                                "length",
+                                currentValue - 1
+                              );
+                            }
+                          }}
+                          className="text-white hover:text-[#FF5722] p-1 rounded-t-full transition cursor-pointer"
+                        >
+                          <ChevronDown className="w-3 h-3 sm:w-8 sm:h-8" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -747,7 +808,8 @@ const CustomCake = () => {
 
   return (
     <div
-      className={`font-secondary min-h-screen ${isConfirmPage && "bg-white"}`} style={{ backgroundImage: `url(${bg2})` }}
+      className={`font-secondary min-h-screen ${isConfirmPage && "bg-white"}`}
+      style={{ backgroundImage: `url(${bg2})` }}
     >
       <div className="py-6 md:py-16" style={{ backgroundImage: `url(${bg})` }}>
         <div className="container mx-auto px-4 text-center">
@@ -776,9 +838,9 @@ const CustomCake = () => {
               <button
                 onClick={handlePrevious}
                 disabled={currentStep === 1}
-                className={`hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full items-center justify-center transition ${
+                className={`hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full items-center justify-center transition cursor-pointer ${
                   currentStep === 1
-                    ? "bg-gray-800 text-gray-600 cursor-not-allowed"
+                    ? "bg-grZay-800 text-gray-600 cursor-not-allowed"
                     : "bg-gray-800 text-white hover:bg-gray-700"
                 }`}
               >
@@ -787,7 +849,7 @@ const CustomCake = () => {
 
               <button
                 onClick={handleNext}
-                className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-gray-800 text-white hover:bg-gray-700 items-center justify-center transition"
+                className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-gray-800 text-white hover:bg-gray-700 items-center justify-center transition cursor-pointer"
               >
                 <ChevronRight className="w-6 h-6" />
               </button>
