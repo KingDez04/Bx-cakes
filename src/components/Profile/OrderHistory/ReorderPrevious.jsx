@@ -1,100 +1,100 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import { toast } from "react-hot-toast";
+import axios from "axios";
+
+const API_BASE_URL = "https://bx-cakes-backend.onrender.com/api";
 
 const ReorderPrevious = () => {
   const navigate = useNavigate();
   const [categoryFilter, setCategoryFilter] = useState("All");
-  const [statusFilter, setStatusFilter] = useState("All");
+  const [statusFilter, setStatusFilter] = useState("Completed");
   const [priceRange, setPriceRange] = useState("All");
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [orders, setOrders] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const orders = [
-    {
-      id: "12845",
-      location: "Ikoyi, Lagos",
-      price: "NGN50000",
-      orderDate: "20th July 2025",
-      status: "Completed",
-      category: "None",
-      image:
-        "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=500",
-      shape: "Circle",
-      tiers: "3 Tiers",
-      tierSpecs: [
+  useEffect(() => {
+    fetchCompletedOrders();
+  }, [categoryFilter, statusFilter, priceRange]);
+
+  const fetchCompletedOrders = async () => {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      toast.error("Please log in");
+      navigate("/login");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      let url = `${API_BASE_URL}/orders?status=completed&limit=50`;
+
+      if (categoryFilter !== "All") {
+        url += `&category=${categoryFilter}`;
+      }
+
+      const response = await axios.get(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (response.data.success) {
+        setOrders(response.data.data.orders);
+      }
+    } catch (error) {
+      console.error("Fetch orders error:", error);
+
+      if (error.response?.status === 401) {
+        toast.error("Session expired. Please log in again.");
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("user");
+        navigate("/login");
+      } else {
+        toast.error(error.response?.data?.message || "Failed to fetch orders");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleReorder = async (order) => {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      toast.error("Please log in");
+      navigate("/login");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/orders/${order._id}/reorder`,
+        {},
         {
-          tier: 1,
-          flavours: 2,
-          measurement: "D-8-H:10-L:8-W:9",
-          flavourSpec: "Chocolate, Vanilla",
-        },
-        {
-          tier: 2,
-          flavours: 1,
-          measurement: "D-8-H:10-L:8-W:9",
-          flavourSpec: "Chocolate",
-        },
-      ],
-      customerNote:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's",
-    },
-    {
-      id: "12845",
-      location: "Ikoyi, Lagos",
-      price: "NGN50000",
-      orderDate: "20th July 2025",
-      status: "Completed",
-      category: "None",
-      image:
-        "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=500",
-      shape: "Circle",
-      tiers: "3 Tiers",
-      tierSpecs: [
-        {
-          tier: 1,
-          flavours: 2,
-          measurement: "D-8-H:10-L:8-W:9",
-          flavourSpec: "Chocolate, Vanilla",
-        },
-        {
-          tier: 2,
-          flavours: 1,
-          measurement: "D-8-H:10-L:8-W:9",
-          flavourSpec: "Chocolate",
-        },
-      ],
-      customerNote:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's",
-    },
-    {
-      id: "12845",
-      location: "Ikoyi, Lagos",
-      price: "NGN50000",
-      orderDate: "20th July 2025",
-      status: "Completed",
-      category: "None",
-      image:
-        "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=500",
-      shape: "Circle",
-      tiers: "3 Tiers",
-      tierSpecs: [
-        {
-          tier: 1,
-          flavours: 2,
-          measurement: "D-8-H:10-L:8-W:9",
-          flavourSpec: "Chocolate, Vanilla",
-        },
-        {
-          tier: 2,
-          flavours: 1,
-          measurement: "D-8-H:10-L:8-W:9",
-          flavourSpec: "Chocolate",
-        },
-      ],
-      customerNote:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's",
-    },
-  ];
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (response.data.success) {
+        toast.success("Order placed successfully!");
+        setTimeout(() => {
+          navigate("/order-history");
+        }, 2000);
+      }
+    } catch (error) {
+      console.error("Reorder error:", error);
+
+      if (error.response?.status === 401) {
+        toast.error("Session expired. Please log in again.");
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("user");
+        navigate("/login");
+      } else {
+        toast.error(error.response?.data?.message || "Failed to reorder");
+      }
+    }
+  };
 
   const handleOrderClick = (order) => {
     setSelectedOrder(order);
@@ -114,7 +114,9 @@ const ReorderPrevious = () => {
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="font-secondary text-2xl font-bold">Reorder Previous Order</h1>
+          <h1 className="font-secondary text-2xl font-bold">
+            Reorder Previous Order
+          </h1>
         </div>
 
         <div className="flex gap-3 mb-6">
@@ -212,7 +214,7 @@ const ReorderPrevious = () => {
           <div className="space-y-3">
             {orders.map((order, index) => (
               <div
-                key={index}
+                key={order._id || order.id || index}
                 onClick={() => handleOrderClick(order)}
                 className={`p-4 rounded-lg cursor-pointer transition-colors ${
                   selectedOrder === order
@@ -222,7 +224,9 @@ const ReorderPrevious = () => {
               >
                 <div className="flex justify-between items-start">
                   <div>
-                    <p className="font-semibold">Order ID: {order.id}</p>
+                    <p className="font-semibold">
+                      Order ID: {order.orderNumber || order._id || order.id}
+                    </p>
                     <p className="text-sm text-gray-600">{order.location}</p>
                   </div>
                   <div className="text-right">
@@ -238,15 +242,23 @@ const ReorderPrevious = () => {
 
           {selectedOrder && (
             <div className="bg-white rounded-lg p-6">
-              <h2 className="font-secondary text-xl font-bold mb-6">Order Details</h2>
+              <h2 className="font-secondary text-xl font-bold mb-6">
+                Order Details
+              </h2>
 
               <div className="space-y-4">
                 <div className="flex justify-between">
                   <p>
-                    <span className="font-semibold">Order ID:</span>
-                    {selectedOrder.id}
+                    <span className="font-semibold">Order ID: </span>
+                    {selectedOrder.orderNumber ||
+                      selectedOrder._id ||
+                      selectedOrder.id}
                   </p>
-                  <p>{selectedOrder.orderDate}</p>
+                  <p>
+                    {new Date(
+                      selectedOrder.orderDate || selectedOrder.createdAt
+                    ).toLocaleDateString()}
+                  </p>
                 </div>
 
                 <p>

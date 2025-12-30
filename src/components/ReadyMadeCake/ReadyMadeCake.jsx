@@ -1,128 +1,86 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Star, Search } from "lucide-react";
+import axios from "axios";
+import toast from "react-hot-toast";
 import TopReviews from "../TopReviews/TopReviews";
 import Footer from "../Footer/Footer";
 import bg from "../../assets/heading4.png";
 
-// Currency conversion rate (example: 1 USD = 1600 NGN)
-const USD_TO_NGN = 1600;
+const API_BASE_URL = "https://bx-cakes-backend.onrender.com/api";
 
 const ReadyMadeCake = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [priceRange, setPriceRange] = useState("all");
+  const [products, setProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalItems: 0,
+  });
 
-  // Sample products data
-  const allProducts = [
-    {
-      id: 1,
-      name: "Chocolate Delight Cake",
-      price: 45.99,
-      image:
-        "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=500",
-      rating: 4.8,
-      category: "Chocolate Cakes",
-      description: "Rich chocolate layers with creamy frosting",
-    },
-    {
-      id: 2,
-      name: "Strawberry Dream",
-      price: 39.99,
-      image:
-        "https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=500",
-      rating: 4.9,
-      category: "Fruit Cakes",
-      description: "Fresh strawberry cake with whipped cream",
-    },
-    {
-      id: 3,
-      name: "Vanilla Classic",
-      price: 35.99,
-      image:
-        "https://images.unsplash.com/photo-1588195538326-c5b1e5b680ab?w=500",
-      rating: 4.7,
-      category: "Classic Cakes",
-      description: "Traditional vanilla sponge cake",
-    },
-    {
-      id: 4,
-      name: "Red Velvet Love",
-      price: 42.99,
-      image:
-        "https://images.unsplash.com/photo-1586985289688-ca3cf47d3e6e?w=500",
-      rating: 4.9,
-      category: "Special Cakes",
-      description: "Signature red velvet with cream cheese frosting",
-    },
-    {
-      id: 5,
-      name: "Lemon Bliss",
-      price: 37.99,
-      image:
-        "https://images.unsplash.com/photo-1519915212116-7cfef71f1d3e?w=500",
-      rating: 4.6,
-      category: "Fruit Cakes",
-      description: "Zesty lemon cake with tangy frosting",
-    },
-    {
-      id: 6,
-      name: "Black Forest",
-      price: 48.99,
-      image:
-        "https://images.unsplash.com/photo-1606890737304-57a1ca8a5b62?w=500",
-      rating: 4.8,
-      category: "Chocolate Cakes",
-      description: "Chocolate cake with cherry filling",
-    },
-    {
-      id: 7,
-      name: "Carrot Cake",
-      price: 40.99,
-      image:
-        "https://images.unsplash.com/photo-1621303837174-89787a7d4729?w=500",
-      rating: 4.7,
-      category: "Classic Cakes",
-      description: "Moist carrot cake with walnuts",
-    },
-    {
-      id: 8,
-      name: "Blueberry Cheesecake",
-      price: 44.99,
-      image:
-        "https://images.unsplash.com/photo-1524351199678-941a58a3df50?w=500",
-      rating: 4.9,
-      category: "Special Cakes",
-      description: "Creamy cheesecake with blueberry topping",
-    },
-  ];
+  useEffect(() => {
+    fetchReadyMadeCakes();
+  }, [selectedCategory, priceRange, searchQuery, pagination.currentPage]);
+
+  const fetchReadyMadeCakes = async () => {
+    setIsLoading(true);
+    try {
+      const params = new URLSearchParams();
+
+      if (selectedCategory !== "All") {
+        params.append("category", selectedCategory);
+      }
+
+      if (priceRange !== "all") {
+        params.append("priceRange", priceRange);
+      }
+
+      if (searchQuery.trim()) {
+        params.append("search", searchQuery.trim());
+      }
+
+      params.append("page", pagination.currentPage);
+      params.append("limit", 12);
+
+      const response = await axios.get(
+        `${API_BASE_URL}/cakes/ready-made?${params.toString()}`
+      );
+
+      if (response.data.success) {
+        setProducts(response.data.data.cakes || []);
+        setPagination(
+          response.data.data.pagination || {
+            currentPage: 1,
+            totalPages: 1,
+            totalItems: 0,
+          }
+        );
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to load cakes");
+      setProducts([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    setPagination((prev) => ({ ...prev, currentPage: 1 }));
+    fetchReadyMadeCakes();
+  };
 
   const categories = [
     "All",
     "Chocolate Cakes",
+    "Vanilla Cakes",
     "Fruit Cakes",
     "Classic Cakes",
     "Special Cakes",
   ];
-
-  const filteredProducts = allProducts.filter((product) => {
-    const matchesSearch = product.name
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
-    const matchesCategory =
-      selectedCategory === "All" || product.category === selectedCategory;
-
-    let matchesPrice = true;
-    if (priceRange === "under40") {
-      matchesPrice = product.price < 40;
-    } else if (priceRange === "40to50") {
-      matchesPrice = product.price >= 40 && product.price <= 50;
-    } else if (priceRange === "over50") {
-      matchesPrice = product.price > 50;
-    }
-
-    return matchesSearch && matchesCategory && matchesPrice;
-  });
 
   return (
     <div className="font-tertiary min-h-screen">
@@ -227,57 +185,119 @@ const ReadyMadeCake = () => {
           <main className="flex-1">
             <div className="mb-6 flex justify-between items-center">
               <p className="text-gray-300">
-                Showing {filteredProducts.length} cake
-                {filteredProducts.length !== 1 ? "s" : ""}
+                Showing {products.length} cake
+                {products.length !== 1 ? "s" : ""}
               </p>
             </div>
 
-            {filteredProducts.length === 0 ? (
+            {isLoading ? (
+              <div className="col-span-full flex items-center justify-center py-20">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-orange-600 mx-auto mb-4"></div>
+                  <p className="text-gray-600">Loading cakes...</p>
+                </div>
+              </div>
+            ) : products.length === 0 ? (
               <div className="bg-gray-800 rounded-lg shadow-md p-12 text-center">
                 <p className="text-gray-400 text-lg">
                   No cakes found matching your criteria.
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredProducts.map((product) => (
-                  <Link
-                    key={product.id}
-                    to={`/readymade-cake/${product.id}`}
-                    className="bg-white rounded-xl shadow-md overflow-hidden group hover:shadow-xl transition-shadow"
-                  >
-                    <div className="relative overflow-hidden">
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-300"
-                      />
-                    </div>
-                    <div className="p-4">
-                      <p className="text-sm text-gray-500 mb-1">
-                        {product.category}
-                      </p>
-                      <h3 className="font-semibold text-lg mb-2 group-hover:text-orange-600 transition-colors">
-                        {product.name}
-                      </h3>
-                      <p className="text-sm text-gray-600 mb-3">
-                        {product.description}
-                      </p>
-                      <div className="flex items-center mb-3">
-                        <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                        <span className="ml-1 text-sm text-gray-600">
-                          {product.rating}
-                        </span>
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {products.map((product) => (
+                    <Link
+                      key={product._id || product.id}
+                      to={`/readymade-cake/${product._id || product.id}`}
+                      className="bg-white rounded-xl shadow-md overflow-hidden group hover:shadow-xl transition-shadow"
+                    >
+                      <div className="relative overflow-hidden">
+                        <img
+                          src={
+                            product.image ||
+                            "https://via.placeholder.com/400x300?text=Cake"
+                          }
+                          alt={product.name}
+                          className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-300"
+                        />
+                        {!product.inStock && (
+                          <div className="absolute top-2 right-2 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                            Out of Stock
+                          </div>
+                        )}
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-2xl font-bold text-orange-600">
-                          ₦{(product.price * USD_TO_NGN).toLocaleString()}
-                        </span>
+                      <div className="p-4">
+                        <p className="text-sm text-gray-500 mb-1">
+                          {product.category}
+                        </p>
+                        <h3 className="font-semibold text-lg mb-2 group-hover:text-orange-600 transition-colors">
+                          {product.name}
+                        </h3>
+                        <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                          {product.description}
+                        </p>
+                        <div className="flex items-center mb-3">
+                          <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                          <span className="ml-1 text-sm text-gray-600">
+                            {product.rating || 0} ({product.reviewCount || 0}{" "}
+                            reviews)
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <span className="text-2xl font-bold text-orange-600">
+                              ₦{(product.priceNGN || 0).toLocaleString()}
+                            </span>
+                            <span className="text-sm text-gray-500 ml-2">
+                              ${product.price || 0}
+                            </span>
+                          </div>
+                        </div>
                       </div>
+                    </Link>
+                  ))}
+                </div>
+
+                {!isLoading &&
+                  products.length > 0 &&
+                  pagination.totalPages > 1 && (
+                    <div className="flex justify-center gap-2 mt-8">
+                      <button
+                        onClick={() =>
+                          setPagination((prev) => ({
+                            ...prev,
+                            currentPage: Math.max(1, prev.currentPage - 1),
+                          }))
+                        }
+                        disabled={pagination.currentPage === 1}
+                        className="px-4 py-2 bg-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-300 cursor-pointer"
+                      >
+                        Previous
+                      </button>
+                      <span className="px-4 py-2">
+                        Page {pagination.currentPage} of {pagination.totalPages}
+                      </span>
+                      <button
+                        onClick={() =>
+                          setPagination((prev) => ({
+                            ...prev,
+                            currentPage: Math.min(
+                              pagination.totalPages,
+                              prev.currentPage + 1
+                            ),
+                          }))
+                        }
+                        disabled={
+                          pagination.currentPage === pagination.totalPages
+                        }
+                        className="px-4 py-2 bg-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-300 cursor-pointer"
+                      >
+                        Next
+                      </button>
                     </div>
-                  </Link>
-                ))}
-              </div>
+                  )}
+              </>
             )}
           </main>
         </div>

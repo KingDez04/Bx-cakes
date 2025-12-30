@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   ChevronLeft,
   ChevronRight,
   ChevronUp,
   ChevronDown,
 } from "lucide-react";
+import axios from "axios";
 import toast from "react-hot-toast";
 import Footer from "../Footer/Footer";
 import TopReviews from "../TopReviews/TopReviews";
@@ -21,7 +23,10 @@ import deliveryImg from "../../assets/doorStep.png";
 import attachImg from "../../assets/attach.png";
 import cakeImg from "../../assets/cake2.png";
 
+const API_BASE_URL = "https://bx-cakes-backend.onrender.com/api";
+
 const CustomCake = () => {
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     shape: "",
@@ -31,7 +36,168 @@ const CustomCake = () => {
     designImage: null,
     customerNote: "",
     deliveryMethod: "",
+    deliveryAddress: "",
+    deliveryDate: "",
   });
+  const [calculatedPrice, setCalculatedPrice] = useState(null);
+  const [isCalculating, setIsCalculating] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (
+      currentStep === getConfirmStep() &&
+      formData.shape &&
+      formData.numberOfTiers > 0 &&
+      formData.covering
+    ) {
+      calculatePrice();
+    }
+  }, [currentStep]);
+
+  const calculatePrice = async () => {
+    setIsCalculating(true);
+    try {
+      const priceData = {
+        shape: formData.shape,
+        numberOfTiers: formData.numberOfTiers,
+        covering: formData.covering,
+        tiers: formData.tiers.map((tier, index) => ({
+          size: tier.size?.height || "medium",
+          numberOfFlavors: tier.flavorCount || tier.flavors?.length || 1,
+        })),
+      };
+
+      const response = await axios.post(
+        `${API_BASE_URL}/cakes/custom/calculate-price`,
+        priceData,
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      if (response.data.success) {
+        setCalculatedPrice(response.data.data.totalPrice);
+      }
+    } catch (error) {
+      console.error("Price calculation error:", error);
+      toast.error("Failed to calculate price. Using estimate.");
+      setCalculatedPrice(50000);
+    } finally {
+      setIsCalculating(false);
+    }
+  };
+
+  const handleCheckout = async () => {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      toast.error("Please login to place an order");
+      navigate("/login");
+      return;
+    }
+
+    if (!formData.deliveryMethod) {
+      toast.error("Please select a delivery method");
+      return;
+    }
+
+    if (formData.deliveryMethod === "doorstep" && !formData.deliveryAddress) {
+      toast.error("Please enter delivery address");
+      return;
+    }
+
+    if (!formData.deliveryDate) {
+      toast.error("Please select delivery date");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const orderFormData = new FormData();
+      orderFormData.append("shape", formData.shape);
+      orderFormData.append("numberOfTiers", formData.numberOfTiers);
+      orderFormData.append("covering", formData.covering);
+
+      formData.tiers.forEach((tier, index) => {
+        orderFormData.append(`tiers[${index}][tierNumber]`, index + 1);
+        orderFormData.append(
+          `tiers[${index}][size]`,
+          tier.size?.height || "medium"
+        );
+        orderFormData.append(
+          `tiers[${index}][numberOfFlavors]`,
+          tier.flavorCount || tier.flavors?.length || 1
+        );
+
+        if (tier.flavors && tier.flavors.length > 0) {
+          tier.flavors.forEach((flavor, fIndex) => {
+            orderFormData.append(
+              `tiers[${index}][flavors][${fIndex}][name]`,
+              flavor.flavor || "Vanilla"
+            );
+            orderFormData.append(
+              `tiers[${index}][flavors][${fIndex}][percentage]`,
+              flavor.percentage || 100
+            );
+          });
+        }
+      });
+
+      if (formData.designImage) {
+        orderFormData.append("designImage", formData.designImage);
+      }
+
+      if (formData.customerNote) {
+        orderFormData.append("customerNote", formData.customerNote);
+      }
+
+      orderFormData.append(
+        "deliveryMethod",
+        formData.deliveryMethod === "doorstep" ? "delivery" : "pickup"
+      );
+
+      if (formData.deliveryAddress) {
+        orderFormData.append("deliveryAddress", formData.deliveryAddress);
+      }
+
+      orderFormData.append("deliveryDate", formData.deliveryDate);
+      orderFormData.append("totalPrice", calculatedPrice || 50000);
+
+      const response = await axios.post(
+        `${API_BASE_URL}/orders/custom-cake`,
+        orderFormData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      if (response.data.success) {
+        toast.success("Custom cake order placed successfully!");
+        setTimeout(() => {
+          navigate("/order-history");
+        }, 2000);
+      }
+    } catch (error) {
+      console.error("Order error:", error);
+      if (error.response?.status === 401) {
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("user");
+        toast.error("Session expired. Please login again");
+        navigate("/login");
+      } else if (error.response?.data?.errors) {
+        error.response.data.errors.forEach((err) => {
+          toast.error(err.message);
+        });
+      } else {
+        toast.error(error.response?.data?.message || "Failed to place order");
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const getTotalSteps = () => {
     if (formData.numberOfTiers === 0) return 2;
@@ -698,7 +864,7 @@ const CustomCake = () => {
           <h2 className="text-xl md:text-2xl font-bold text-white mb-8 md:mb-12">
             Choose Your Delivery Method
           </h2>
-          <div className="flex flex-col sm:flex-row justify-center items-center gap-8 sm:gap-12 max-w-3xl mx-auto">
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-8 sm:gap-12 max-w-3xl mx-auto mb-8">
             {[
               { name: "Pickup", img: pickupImg },
               { name: "Doorstep Delivery", img: deliveryImg },
@@ -734,6 +900,39 @@ const CustomCake = () => {
                 </p>
               </div>
             ))}
+          </div>
+
+          {formData.deliveryMethod === "Doorstep Delivery" && (
+            <div className="max-w-md mx-auto mb-6">
+              <label className="block text-white text-sm font-semibold mb-2 text-left">
+                Delivery Address
+              </label>
+              <textarea
+                value={formData.deliveryAddress}
+                onChange={(e) =>
+                  setFormData({ ...formData, deliveryAddress: e.target.value })
+                }
+                placeholder="Enter your full delivery address"
+                className="w-full h-24 bg-gray-900 text-white px-4 py-3 rounded-lg border border-gray-700 focus:border-orange-600 focus:outline-none resize-none placeholder-gray-500"
+                required
+              />
+            </div>
+          )}
+
+          <div className="max-w-md mx-auto mb-6">
+            <label className="block text-white text-sm font-semibold mb-2 text-left">
+              Preferred Delivery/Pickup Date
+            </label>
+            <input
+              type="date"
+              value={formData.deliveryDate}
+              onChange={(e) =>
+                setFormData({ ...formData, deliveryDate: e.target.value })
+              }
+              min={new Date().toISOString().split("T")[0]}
+              className="w-full bg-gray-900 text-white px-4 py-3 rounded-lg border border-gray-700 focus:border-orange-600 focus:outline-none"
+              required
+            />
           </div>
         </div>
       );
@@ -778,21 +977,49 @@ const CustomCake = () => {
                 <p className="font-bold">Delivery Method:</p>
                 <p>{formData.deliveryMethod}</p>
               </div>
+              {formData.deliveryMethod === "Doorstep Delivery" &&
+                formData.deliveryAddress && (
+                  <div>
+                    <p className="font-bold">Delivery Address:</p>
+                    <p>{formData.deliveryAddress}</p>
+                  </div>
+                )}
+              {formData.deliveryDate && (
+                <div>
+                  <p className="font-bold">Delivery/Pickup Date:</p>
+                  <p>{new Date(formData.deliveryDate).toLocaleDateString()}</p>
+                </div>
+              )}
               {formData.customerNote && (
                 <div>
                   <p className="font-bold">Your Note:</p>
                   <p>{formData.customerNote}</p>
                 </div>
               )}
+              <div className="border-t pt-3 mt-3">
+                <p className="font-bold text-lg">Estimated Price:</p>
+                {isCalculating ? (
+                  <p className="text-gray-600">Calculating...</p>
+                ) : (
+                  <p className="text-2xl font-bold text-[#FF5722]">
+                    ₦{(calculatedPrice || 0).toLocaleString()}
+                  </p>
+                )}
+              </div>
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4">
                 <button
                   onClick={() => setCurrentStep(1)}
-                  className="flex-1 bg-gray-200 hover:bg-gray-300 text-black font-bold py-2.5 sm:py-3 rounded-lg transition text-sm sm:text-base"
+                  disabled={isSubmitting}
+                  className="flex-1 bg-gray-200 hover:bg-gray-300 text-black font-bold py-2.5 sm:py-3 rounded-lg transition text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Edit Cake Details
                 </button>
-                <button className="flex-1 bg-[#FF5722] hover:bg-[#FF5722]/90 text-white font-bold py-2.5 sm:py-3 rounded-lg transition text-sm sm:text-base">
-                  Proceed to Checkout
+                <button
+                  onClick={handleCheckout}
+                  disabled={isSubmitting || isCalculating}
+                  className="flex-1 bg-[#FF5722] hover:bg-[#FF5722]/90 text-white font-bold py-2.5 sm:py-3 rounded-lg transition text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSubmitting ? "Placing Order..." : "Proceed to Checkout"}
                 </button>
               </div>
             </div>

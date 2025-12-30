@@ -1,32 +1,164 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Mail, Camera, Lock, LogOut } from "lucide-react";
+import axios from "axios";
 import toast from "react-hot-toast";
 import bg from "../../../assets/heading.png";
-import dp from "../../../assets/staticDp.png";
+import dp from "../../../assets/defaultDp.webp";
+
+const API_BASE_URL = "https://bx-cakes-backend.onrender.com/api";
 
 const Settings = () => {
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("amandaefik@gmail.com");
+  const [email, setEmail] = useState("");
   const [profileImage, setProfileImage] = useState(dp);
+  const [isUpdatingEmail, setIsUpdatingEmail] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
 
-  const handleEmailUpdate = (e) => {
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    if (user.email) setEmail(user.email);
+    if (user.profilePicture) setProfileImage(user.profilePicture);
+  }, []);
+
+  const handleEmailUpdate = async (e) => {
     e.preventDefault();
-    toast.success("Email updated successfully");
+
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      toast.error("Please login to continue");
+      navigate("/login");
+      return;
+    }
+
+    setIsUpdatingEmail(true);
+
+    try {
+      const response = await axios.put(
+        `${API_BASE_URL}/user/settings/email`,
+        { email },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.data.success) {
+        const user = JSON.parse(localStorage.getItem("user") || "{}");
+        user.email = email;
+        localStorage.setItem("user", JSON.stringify(user));
+        toast.success("Email updated successfully");
+      }
+    } catch (error) {
+      console.error("Email update error:", error);
+      if (error.response?.status === 401) {
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("user");
+        toast.error("Session expired. Please login again");
+        navigate("/login");
+      } else if (error.response?.data?.errors) {
+        error.response.data.errors.forEach((err) => {
+          toast.error(err.message);
+        });
+      } else {
+        toast.error(error.response?.data?.message || "Failed to update email");
+      }
+    } finally {
+      setIsUpdatingEmail(false);
+    }
   };
 
   const handleImageUpload = () => {
-    toast.info("Image upload functionality");
+    toast.info("Use Edit Profile page to update profile picture");
+    setTimeout(() => navigate("/edit-profile"), 1500);
   };
 
   const handleChangePassword = () => {
-    toast.info("Password change functionality");
+    setShowPasswordModal(true);
+  };
+
+  const handlePasswordSubmit = async (e) => {
+    e.preventDefault();
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      toast.error("New passwords do not match");
+      return;
+    }
+
+    if (passwordData.newPassword.length < 6) {
+      toast.error("Password must be at least 6 characters");
+      return;
+    }
+
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      toast.error("Please login to continue");
+      navigate("/login");
+      return;
+    }
+
+    setIsChangingPassword(true);
+
+    try {
+      const response = await axios.put(
+        `${API_BASE_URL}/user/settings/password`,
+        {
+          currentPassword: passwordData.currentPassword,
+          newPassword: passwordData.newPassword,
+          confirmPassword: passwordData.confirmPassword,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.data.success) {
+        toast.success("Password changed successfully");
+        setShowPasswordModal(false);
+        setPasswordData({
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+      }
+    } catch (error) {
+      console.error("Password change error:", error);
+      if (error.response?.status === 401) {
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("user");
+        toast.error("Session expired. Please login again");
+        navigate("/login");
+      } else if (error.response?.data?.errors) {
+        error.response.data.errors.forEach((err) => {
+          toast.error(err.message);
+        });
+      } else {
+        toast.error(
+          error.response?.data?.message || "Failed to change password"
+        );
+      }
+    } finally {
+      setIsChangingPassword(false);
+    }
   };
 
   const handleLogout = () => {
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("user");
     toast.success("Logged out successfully");
-    navigate("/login");
+    setTimeout(() => navigate("/login"), 1000);
   };
 
   return (
@@ -88,9 +220,10 @@ const Settings = () => {
               </div>
               <button
                 type="submit"
-                className="w-full px-6 py-3 bg-[#FF5722] text-white rounded-lg hover:bg-[#E64A19] transition-colors font-medium cursor-pointer"
+                disabled={isUpdatingEmail}
+                className="w-full px-6 py-3 bg-[#FF5722] text-white rounded-lg hover:bg-[#E64A19] transition-colors font-medium cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Update Email
+                {isUpdatingEmail ? "Updating..." : "Update Email"}
               </button>
             </form>
           </div>
@@ -131,6 +264,92 @@ const Settings = () => {
           </div>
         </div>
       </div>
+
+      {showPasswordModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-md w-full p-6">
+            <h2 className="text-2xl font-bold mb-4">Change Password</h2>
+            <form onSubmit={handlePasswordSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Current Password
+                </label>
+                <input
+                  type="password"
+                  value={passwordData.currentPassword}
+                  onChange={(e) =>
+                    setPasswordData({
+                      ...passwordData,
+                      currentPassword: e.target.value,
+                    })
+                  }
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF5722]"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  New Password
+                </label>
+                <input
+                  type="password"
+                  value={passwordData.newPassword}
+                  onChange={(e) =>
+                    setPasswordData({
+                      ...passwordData,
+                      newPassword: e.target.value,
+                    })
+                  }
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF5722]"
+                  required
+                  minLength={6}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Confirm New Password
+                </label>
+                <input
+                  type="password"
+                  value={passwordData.confirmPassword}
+                  onChange={(e) =>
+                    setPasswordData({
+                      ...passwordData,
+                      confirmPassword: e.target.value,
+                    })
+                  }
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF5722]"
+                  required
+                  minLength={6}
+                />
+              </div>
+              <div className="flex gap-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowPasswordModal(false);
+                    setPasswordData({
+                      currentPassword: "",
+                      newPassword: "",
+                      confirmPassword: "",
+                    });
+                  }}
+                  className="flex-1 px-4 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isChangingPassword}
+                  className="flex-1 px-4 py-3 bg-[#FF5722] text-white rounded-lg hover:bg-[#E64A19] transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isChangingPassword ? "Changing..." : "Change Password"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

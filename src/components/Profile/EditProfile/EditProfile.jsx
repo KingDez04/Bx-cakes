@@ -1,21 +1,68 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Edit } from "lucide-react";
+import axios from "axios";
 import toast from "react-hot-toast";
-import dp from "../../../assets/staticDp.png";
+import dp from "../../../assets/defaultDp.webp";
+
+const API_BASE_URL = "https://bx-cakes-backend.onrender.com/api";
 
 const EditProfile = () => {
   const navigate = useNavigate();
-
-  // user data from context/API
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState({
-    name: "Amanda Efiko",
-    email: "amandaefik@gmail.com",
+    name: "",
+    email: "",
     profileImage: dp,
-    address: "17 istriajafimuana, ajejifjfi close, Ogun State",
-    personalNote: "None",
-    phoneNumber: "03048449240383",
+    address: "",
+    personalNote: "",
+    phoneNumber: "",
   });
+
+  useEffect(() => {
+    fetchUserProfile();
+  }, []);
+
+  const fetchUserProfile = async () => {
+    try {
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        toast.error("Please login to edit your profile");
+        navigate("/login");
+        return;
+      }
+
+      const response = await axios.get(`${API_BASE_URL}/user/profile`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.data.success) {
+        const user = response.data.data.user;
+        setFormData({
+          name: user.name || "",
+          email: user.email || "",
+          profileImage: user.profilePicture || dp,
+          address: user.address || "",
+          personalNote: user.personalNote || "",
+          phoneNumber: user.phoneNumber || "",
+        });
+      }
+    } catch (error) {
+      if (error.response?.status === 401) {
+        toast.error("Session expired. Please login again.");
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("user");
+        navigate("/login");
+      } else {
+        toast.error(error.response?.data?.message || "Failed to load profile");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleChange = (e) => {
     setFormData({
@@ -24,24 +71,102 @@ const EditProfile = () => {
     });
   };
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
-    // save to backend/context
-    toast.success("Profile updated successfully!");
-    navigate("/profile");
+    setIsSaving(true);
+
+    try {
+      const token = localStorage.getItem("authToken");
+      const updateData = {
+        name: formData.name,
+        address: formData.address,
+        phoneNumber: formData.phoneNumber,
+        personalNote: formData.personalNote,
+      };
+
+      const response = await axios.put(
+        `${API_BASE_URL}/user/profile`,
+        updateData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data.success) {
+        toast.success(response.data.message || "Profile updated successfully!");
+        localStorage.setItem("user", JSON.stringify(response.data.data.user));
+        navigate("/profile");
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to update profile");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleCancel = () => {
     navigate("/profile");
   };
 
-  const handleImageEdit = () => {
-    toast.info("Image upload functionality");
+  const handleImageEdit = async () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      try {
+        const token = localStorage.getItem("authToken");
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const response = await axios.post(
+          `${API_BASE_URL}/user/profile/picture`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        if (response.data.success) {
+          toast.success("Profile picture updated successfully!");
+          setFormData((prev) => ({
+            ...prev,
+            profileImage: response.data.data.user.profilePicture,
+          }));
+          localStorage.setItem("user", JSON.stringify(response.data.data.user));
+        }
+      } catch (error) {
+        toast.error(error.response?.data?.message || "Failed to upload image");
+      }
+    };
+    input.click();
   };
 
   const handleNameEdit = () => {
-    toast.info("Edit name functionality");
+    const nameInput = document.querySelector('input[name="name"]');
+    if (nameInput) {
+      nameInput.focus();
+      toast.info("Update your name in the form below");
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="font-main min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FF5722] mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="font-main min-h-screen bg-white">
@@ -80,6 +205,33 @@ const EditProfile = () => {
         <div className="mx-auto px-4 -mt-8">
           <form onSubmit={handleSave} className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-32 gap-y-6 mb-10">
+              <div>
+                <label className="font-tertiary block text-[18.68px] font-semibold text-black mb-3">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="w-full px-6 py-4 bg-[#E8E8E8] border-0 rounded-[30px] text-black text-base focus:outline-none focus:ring-2 focus:ring-[#FF5722]"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="font-tertiary block text-[18.68px] font-semibold text-black mb-3">
+                  Phone Number
+                </label>
+                <input
+                  type="tel"
+                  name="phoneNumber"
+                  value={formData.phoneNumber}
+                  onChange={handleChange}
+                  className="w-full px-6 py-4 bg-[#E8E8E8] border-0 rounded-[30px] text-black text-base focus:outline-none focus:ring-2 focus:ring-[#FF5722]"
+                />
+              </div>
+
               <div>
                 <label className="font-tertiary block text-[18.68px] font-semibold text-black mb-3">
                   Your Address
@@ -133,9 +285,10 @@ const EditProfile = () => {
               </button>
               <button
                 type="submit"
-                className="flex-1 max-w-[290px] px-8 py-3.5 bg-[#FF5722] text-white text-lg font-medium rounded-full hover:bg-[#E64A19] transition-colors cursor-pointer"
+                disabled={isSaving}
+                className="flex-1 max-w-[290px] px-8 py-3.5 bg-[#FF5722] text-white text-lg font-medium rounded-full hover:bg-[#E64A19] transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Save Changes
+                {isSaving ? "Saving..." : "Save Changes"}
               </button>
             </div>
           </form>

@@ -1,19 +1,69 @@
 import { useNavigate } from "react-router-dom";
 import { Edit, Clock, Settings, Plus, RotateCcw } from "lucide-react";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import toast from "react-hot-toast";
 import bg from "../../../assets/heading.png";
-import dp from "../../../assets/staticDp.png";
+import dp from "../../../assets/defaultDp.webp";
+
+const API_BASE_URL = "https://bx-cakes-backend.onrender.com/api";
 
 const ProfilePage = () => {
   const navigate = useNavigate();
+  const [userData, setUserData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Sample user data
-  const userData = {
-    name: "Amanda Efiko",
-    email: "amandaefik@gmail.com",
-    profileImage: dp,
-    totalOrders: 3,
-    totalSpent: 34000,
+  useEffect(() => {
+    fetchUserProfile();
+  }, []);
+
+  const fetchUserProfile = async () => {
+    try {
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        toast.error("Please login to view your profile");
+        navigate("/login");
+        return;
+      }
+
+      const response = await axios.get(`${API_BASE_URL}/user/profile`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.data.success) {
+        setUserData(response.data.data.user);
+        localStorage.setItem("user", JSON.stringify(response.data.data.user));
+      }
+    } catch (error) {
+      if (error.response?.status === 401) {
+        toast.error("Session expired. Please login again.");
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("user");
+        navigate("/login");
+      } else {
+        toast.error(error.response?.data?.message || "Failed to load profile");
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="font-main min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FF5722] mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!userData) {
+    return null;
+  }
 
   const actionButtons1 = [
     {
@@ -56,7 +106,7 @@ const ProfilePage = () => {
         <div className="relative inline-block mb-6">
           <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-[#4A6B8A] bg-[#4A6B8A] mx-auto">
             <img
-              src={userData.profileImage}
+              src={userData.profilePicture || dp}
               alt={userData.name}
               className="w-full h-full object-cover"
             />
@@ -74,12 +124,12 @@ const ProfilePage = () => {
           <div className="grid grid-cols-2 gap-4 text-center text-white">
             <div>
               <p className="text-sm mb-1 opacity-90">Total Orders</p>
-              <p className="text-4xl font-bold">{userData.totalOrders}</p>
+              <p className="text-4xl font-bold">{userData.totalOrders || 0}</p>
             </div>
             <div>
               <p className="text-sm mb-1 opacity-90">Total Spent</p>
               <p className="text-4xl font-bold">
-                {userData.totalSpent.toLocaleString()}
+                ₦{(userData.totalSpent || 0).toLocaleString()}
               </p>
             </div>
           </div>

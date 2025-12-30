@@ -2,14 +2,18 @@ import { useState } from "react";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { toast } from "react-hot-toast";
+import axios from "axios";
 import Footer from "../Footer/Footer";
 import TopReviews from "../TopReviews/TopReviews";
+
+const API_BASE_URL = "https://bx-cakes-backend.onrender.com/api";
 
 const ModifyCakeCheckout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { id } = useParams();
   const { cake, formData } = location.state || {};
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!cake || !formData) {
     return (
@@ -27,11 +31,120 @@ const ModifyCakeCheckout = () => {
     );
   }
 
-  const handleCheckout = () => {
-    toast.success("Order placed successfully! We'll contact you shortly.");
-    setTimeout(() => {
-      navigate("/review-order");
-    }, 2000);
+  const handleCheckout = async () => {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      toast.error("Please log in to place an order");
+      navigate("/login");
+      return;
+    }
+
+    if (!formData.deliveryMethod) {
+      toast.error("Please select a delivery method");
+      return;
+    }
+
+    if (
+      formData.deliveryMethod === "Doorstep Delivery" &&
+      !formData.deliveryAddress
+    ) {
+      toast.error("Please provide a delivery address");
+      return;
+    }
+
+    if (!formData.deliveryDate) {
+      toast.error("Please select a delivery date");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const orderData = new FormData();
+
+      orderData.append("cakeId", cake._id || cake.cakeId);
+      orderData.append("shape", formData.shape);
+      orderData.append("numberOfTiers", formData.numberOfTiers);
+      orderData.append("covering", formData.covering);
+
+      const modifications = {
+        originalImage: cake.image,
+        requestedChanges: formData.customerNote || "Modified design as shown",
+      };
+      orderData.append("modifications", JSON.stringify(modifications));
+
+      formData.tiers.forEach((tier, index) => {
+        orderData.append(`tiers[${index}][tierNumber]`, tier.tierNumber);
+        orderData.append(
+          `tiers[${index}][size]`,
+          tier.size.diameter || tier.size.length
+        );
+        orderData.append(
+          `tiers[${index}][numberOfFlavors]`,
+          tier.flavors.length
+        );
+
+        tier.flavors.forEach((flavor, fIndex) => {
+          orderData.append(
+            `tiers[${index}][flavors][${fIndex}][name]`,
+            flavor.flavor
+          );
+          orderData.append(
+            `tiers[${index}][flavors][${fIndex}][percentage]`,
+            flavor.percentage
+          );
+        });
+      });
+
+      orderData.append(
+        "deliveryMethod",
+        formData.deliveryMethod === "Pickup" ? "pickup" : "delivery"
+      );
+      if (formData.deliveryAddress) {
+        orderData.append("deliveryAddress", formData.deliveryAddress);
+      }
+      orderData.append("deliveryDate", formData.deliveryDate);
+
+      if (formData.customerNote) {
+        orderData.append("customerNote", formData.customerNote);
+      }
+
+      const response = await axios.post(
+        `${API_BASE_URL}/orders/modify-cake`,
+        orderData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      if (response.data.success) {
+        toast.success(response.data.message || "Order placed successfully!");
+        setTimeout(() => {
+          navigate("/order-history");
+        }, 2000);
+      }
+    } catch (error) {
+      console.error("Checkout error:", error);
+
+      if (error.response?.status === 401) {
+        toast.error("Session expired. Please log in again.");
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("user");
+        navigate("/login");
+      } else if (error.response?.data?.errors) {
+        error.response.data.errors.forEach((err) => toast.error(err.msg));
+      } else {
+        toast.error(
+          error.response?.data?.message ||
+            "Failed to place order. Please try again."
+        );
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleEdit = () => {
@@ -121,6 +234,21 @@ const ModifyCakeCheckout = () => {
                   {formData.deliveryMethod}
                 </div>
 
+                {formData.deliveryMethod === "Doorstep Delivery" &&
+                  formData.deliveryAddress && (
+                    <div className="border-t pt-2 mt-2">
+                      <span className="font-bold">Delivery Address:</span>
+                      <p className="text-sm mt-1">{formData.deliveryAddress}</p>
+                    </div>
+                  )}
+
+                {formData.deliveryDate && (
+                  <div className="border-t pt-2 mt-2">
+                    <span className="font-bold">Delivery/Pickup Date:</span>{" "}
+                    {new Date(formData.deliveryDate).toLocaleDateString()}
+                  </div>
+                )}
+
                 {formData.customerNote && (
                   <div className="border-t pt-2 mt-2">
                     <span className="font-bold">Your Note:</span>
@@ -133,15 +261,17 @@ const ModifyCakeCheckout = () => {
             <div className="flex flex-col sm:flex-row gap-4 mt-8">
               <button
                 onClick={handleEdit}
-                className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-3 rounded-lg font-semibold transition-colors cursor-pointer"
+                disabled={isSubmitting}
+                className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-3 rounded-lg font-semibold transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Edit Details
               </button>
               <button
                 onClick={handleCheckout}
-                className="flex-1 bg-[#FF5722] hover:bg-[#FF5722]/90 text-white px-6 py-3 rounded-lg font-semibold transition-colors cursor-pointer"
+                disabled={isSubmitting}
+                className="flex-1 bg-[#FF5722] hover:bg-[#FF5722]/90 text-white px-6 py-3 rounded-lg font-semibold transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Proceed to Checkout
+                {isSubmitting ? "Placing Order..." : "Proceed to Checkout"}
               </button>
             </div>
           </div>

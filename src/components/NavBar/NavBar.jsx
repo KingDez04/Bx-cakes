@@ -1,16 +1,32 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import bxLogo from "../../assets/bx-logo.png";
-import dp from "../../assets/staticDp.png";
+import dp from "../../assets/defaultDp.webp";
 
 const NavBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [user, setUser] = useState(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      setUser(JSON.parse(userData));
+    }
+  }, []);
 
   const handleLinkClick = () => {
     window.scrollTo(0, 0);
     setIsMenuOpen(false);
+  };
+
+  const handleProfileClick = () => {
+    if (user) {
+      navigate("/profile");
+    } else {
+      navigate("/login");
+    }
   };
 
   const navLinks = [
@@ -48,10 +64,15 @@ const NavBar = () => {
 
           <div className="flex items-center space-x-4">
             <button
-              onClick={() => navigate("/profile")}
+              onClick={handleProfileClick}
               className="w-10 md:w-[73px] h-10 md:h-[73px] rounded-full overflow-hidden border-2 border-transparent hover:border-[#FD5A2F] transition-colors cursor-pointer"
+              title={user ? `${user.name}'s Profile` : "Login"}
             >
-              <img src={dp} className="w-full h-full object-cover" />
+              <img
+                src={user?.profilePicture || dp}
+                alt={user ? user.name : "Profile"}
+                className="w-full h-full object-cover"
+              />
             </button>
 
             <button

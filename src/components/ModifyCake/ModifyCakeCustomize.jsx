@@ -44,6 +44,8 @@ const ModifyCakeCustomize = () => {
       },
     ],
     deliveryMethod: "",
+    deliveryAddress: "",
+    deliveryDate: "",
     customerNote: "",
   });
 
@@ -63,7 +65,7 @@ const ModifyCakeCustomize = () => {
     );
   }
 
-  const totalSteps = 5 + formData.numberOfTiers; // Shape, Tiers, Covering, Tier details, Delivery, Note
+  const totalSteps = 5 + formData.numberOfTiers;
 
   const handleNext = () => {
     if (currentStep === 1 && !formData.shape) {
@@ -79,7 +81,6 @@ const ModifyCakeCustomize = () => {
     if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
     } else {
-      // Go to checkout
       navigate(`/modify-cake/${id}/checkout`, { state: { cake, formData } });
     }
   };
@@ -411,6 +412,37 @@ const ModifyCakeCustomize = () => {
             ))}
           </div>
 
+          {formData.deliveryMethod === "Doorstep Delivery" && (
+            <div className="max-w-md mx-auto mb-6">
+              <label className="block text-white text-sm font-semibold mb-2 text-left">
+                Delivery Address
+              </label>
+              <textarea
+                value={formData.deliveryAddress}
+                onChange={(e) =>
+                  updateFormData("deliveryAddress", e.target.value)
+                }
+                placeholder="Enter your full delivery address"
+                className="w-full h-24 bg-gray-900 text-white px-4 py-3 rounded-lg border border-gray-700 focus:border-orange-600 focus:outline-none resize-none placeholder-gray-500"
+                required
+              />
+            </div>
+          )}
+
+          <div className="max-w-md mx-auto mb-6">
+            <label className="block text-white text-sm font-semibold mb-2 text-left">
+              Preferred Delivery/Pickup Date
+            </label>
+            <input
+              type="date"
+              value={formData.deliveryDate}
+              onChange={(e) => updateFormData("deliveryDate", e.target.value)}
+              min={new Date().toISOString().split("T")[0]}
+              className="w-full bg-gray-900 text-white px-4 py-3 rounded-lg border border-gray-700 focus:border-orange-600 focus:outline-none"
+              required
+            />
+          </div>
+
           <button
             onClick={handleNext}
             className="bg-[#FF5722] hover:bg-[#FF5722]/90 text-white px-12 py-3 rounded-full text-lg font-semibold transition-colors cursor-pointer"
@@ -461,10 +493,7 @@ const ModifyCakeCustomize = () => {
       className="font-secondary min-h-screen bg-linear-to-br "
       style={{ backgroundImage: `url(${bg})` }}
     >
-      <div
-        className="py-16 px-4"
-        style={{ backgroundImage: `url(${bg2})` }}
-      >
+      <div className="py-16 px-4" style={{ backgroundImage: `url(${bg2})` }}>
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
             Modify A Cake

@@ -1,48 +1,102 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Star } from "lucide-react";
+import { toast } from "react-hot-toast";
+import axios from "axios";
+
+const API_BASE_URL = "https://bx-cakes-backend.onrender.com/api";
 
 const ViewReview = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [showEditForm, setShowEditForm] = useState(false);
-  const [rating, setRating] = useState(4);
+  const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
-  const [customerNote, setCustomerNote] = useState(
-    "I felt that the cake was...."
-  );
+  const [customerNote, setCustomerNote] = useState("");
+  const [orderDetails, setOrderDetails] = useState(null);
+  const [reviewData, setReviewData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isUpdating, setIsUpdating] = useState(false);
 
-  const orderDetails = {
-    orderId: "12845",
-    orderDate: "20th July 2025",
-    status: "Ongoing",
-    category: "None",
-    image: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=500",
-    shape: "Circle",
-    tiers: "3 Tiers",
-    tierSpecs: [
-      {
-        tier: 1,
-        flavours: 2,
-        measurement: "D-8-H:10-L:8-W:9",
-        flavourSpec: "Chocolate, Vanilla",
-      },
-      {
-        tier: 2,
-        flavours: 1,
-        measurement: "D-8-H:10-L:8-W:9",
-        flavourSpec: "Chocolate",
-      },
-    ],
-    customerNote:
-      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's",
-    reviewNote:
-      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker inclu",
+  useEffect(() => {
+    fetchReview();
+  }, [id]);
+
+  const fetchReview = async () => {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      toast.error("Please log in");
+      navigate("/login");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const response = await axios.get(`${API_BASE_URL}/reviews/order/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (response.data.success) {
+        const review = response.data.data.review;
+        setReviewData(review);
+        setRating(review.rating);
+        setCustomerNote(review.comment);
+        setOrderDetails(review.orderId);
+      }
+    } catch (error) {
+      console.error("Fetch review error:", error);
+
+      if (error.response?.status === 401) {
+        toast.error("Session expired. Please log in again.");
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("user");
+        navigate("/login");
+      } else {
+        toast.error(error.response?.data?.message || "Failed to fetch review");
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleDeleteReview = () => {
-    if (window.confirm("Are you sure you want to delete this review?")) {
-      navigate("/order-history");
+  const handleDeleteReview = async () => {
+    if (!window.confirm("Are you sure you want to delete this review?")) {
+      return;
+    }
+
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      toast.error("Please log in");
+      navigate("/login");
+      return;
+    }
+
+    try {
+      const response = await axios.delete(
+        `${API_BASE_URL}/reviews/${reviewData._id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (response.data.success) {
+        toast.success("Review deleted successfully");
+        setTimeout(() => {
+          navigate("/order-history");
+        }, 1500);
+      }
+    } catch (error) {
+      console.error("Delete review error:", error);
+
+      if (error.response?.status === 401) {
+        toast.error("Session expired. Please log in again.");
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("user");
+        navigate("/login");
+      } else {
+        toast.error(error.response?.data?.message || "Failed to delete review");
+      }
     }
   };
 
@@ -50,10 +104,79 @@ const ViewReview = () => {
     setShowEditForm(true);
   };
 
-  const handleSubmitEdit = () => {
-    setShowEditForm(false);
-    // Save edited review
+  const handleSubmitEdit = async () => {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      toast.error("Please log in");
+      navigate("/login");
+      return;
+    }
+
+    if (!rating || !customerNote) {
+      toast.error("Please provide a rating and comment");
+      return;
+    }
+
+    setIsUpdating(true);
+
+    try {
+      const response = await axios.put(
+        `${API_BASE_URL}/reviews/${reviewData._id}`,
+        {
+          rating,
+          comment: customerNote,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (response.data.success) {
+        toast.success("Review updated successfully");
+        setShowEditForm(false);
+        fetchReview();
+      }
+    } catch (error) {
+      console.error("Update review error:", error);
+
+      if (error.response?.status === 401) {
+        toast.error("Session expired. Please log in again.");
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("user");
+        navigate("/login");
+      } else if (error.response?.data?.errors) {
+        error.response.data.errors.forEach((err) => toast.error(err.msg));
+      } else {
+        toast.error(error.response?.data?.message || "Failed to update review");
+      }
+    } finally {
+      setIsUpdating(false);
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex justify-center items-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
+      </div>
+    );
+  }
+
+  if (!orderDetails || !reviewData) {
+    return (
+      <div className="min-h-screen flex justify-center items-center">
+        <div className="text-center">
+          <p className="text-xl mb-4">Review not found</p>
+          <button
+            onClick={() => navigate("/order-history")}
+            className="bg-[#FF5722] px-6 py-3 rounded-full hover:bg-[#FF5722]/90 transition-colors text-white"
+          >
+            Back to Order History
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="font-main min-h-screen bg-gray-100">

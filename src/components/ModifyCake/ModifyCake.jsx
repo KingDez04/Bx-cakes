@@ -1,9 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
+import axios from "axios";
+import toast from "react-hot-toast";
 import Footer from "../Footer/Footer";
 import TopReviews from "../TopReviews/TopReviews";
 import bg2 from "../../assets/heading4.png";
+
+const API_BASE_URL = "https://bx-cakes-backend.onrender.com/api";
 
 const ModifyCake = () => {
   const navigate = useNavigate();
@@ -16,66 +20,50 @@ const ModifyCake = () => {
   const [selectedCake, setSelectedCake] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
-  // Sample cakes data matching the images
-  const allCakes = [
-    {
-      id: 1,
-      name: "Chocolate Delight Cake",
-      image:
-        "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=500",
-      event: "Birthday",
-      flavor: "Chocolate",
-      priceRange: "₦30,000 - ₦50,000",
-      time: "3-5 days",
-      covering: "Buttercream",
-      description:
-        "A stunning 3-tier red velvet cake with rich chocolate churros frosting—perfect for weddings, birthdays, or graduations. Serves 30–40 people.",
-      tags: ["3-tier cake", "Birthday Cake", "Vegan", "Gluten Free"],
-      cakeId: "CAKE001",
-    },
-    {
-      id: 2,
-      name: "Birthday Celebration",
-      image: "https://images.unsplash.com/photo-1558636508-e0db3814bd1d?w=500",
-      event: "Birthday",
-      flavor: "Vanilla",
-      priceRange: "₦30,000 - ₦50,000",
-      time: "1-2 days",
-      covering: "Fondant",
-      description:
-        "Colorful birthday cake with candles and festive decorations",
-      tags: ["Birthday Cake", "Chocolate"],
-      cakeId: "CAKE002",
-    },
-    {
-      id: 3,
-      name: "Elegant White",
-      image:
-        "https://images.unsplash.com/photo-1535254973040-607b474cb50d?w=500",
-      event: "Wedding",
-      flavor: "Vanilla",
-      priceRange: "₦50,000+",
-      time: "5-7 days",
-      covering: "Fondant",
-      description: "Multi-tiered white wedding cake with delicate decorations",
-      tags: ["Wedding Cake", "Vanilla"],
-      cakeId: "CAKE003",
-    },
-    {
-      id: 4,
-      name: "Classic White",
-      image:
-        "https://images.unsplash.com/photo-1606890737304-57a1ca8a5b62?w=500",
-      event: "Wedding",
-      flavor: "Vanilla",
-      priceRange: "₦50,000+",
-      time: "5-7 days",
-      covering: "Fondant",
-      description: "Elegant tiered white cake perfect for special occasions",
-      tags: ["Wedding Cake", "Vanilla"],
-      cakeId: "CAKE004",
-    },
-  ];
+  const [allCakes, setAllCakes] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  useEffect(() => {
+    fetchCakes();
+  }, [
+    currentPage,
+    selectedEvent,
+    selectedFlavor,
+    selectedPriceRange,
+    selectedTime,
+    selectedCovering,
+    searchQuery,
+  ]);
+
+  const fetchCakes = async () => {
+    setIsLoading(true);
+    try {
+      const params = new URLSearchParams();
+
+      if (selectedEvent !== "All") params.append("category", selectedEvent);
+      if (searchQuery) params.append("search", searchQuery);
+      if (selectedPriceRange !== "All")
+        params.append("priceRange", selectedPriceRange);
+      params.append("page", currentPage);
+      params.append("limit", 12);
+
+      const response = await axios.get(
+        `${API_BASE_URL}/cakes/modify?${params.toString()}`
+      );
+
+      if (response.data.success) {
+        setAllCakes(response.data.data.cakes || []);
+        setTotalPages(response.data.data.pagination?.totalPages || 1);
+      }
+    } catch (error) {
+      console.error("Error fetching cakes:", error);
+      toast.error(error.response?.data?.message || "Failed to load cakes");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const eventOptions = [
     "All",
@@ -106,29 +94,20 @@ const ModifyCake = () => {
     "Ganache",
   ];
 
-  // Filter cakes based on selected filters and search query
+  // Client-side filter for flavors, time, and covering (not in API params)
   const filteredCakes = allCakes.filter((cake) => {
-    const matchesSearch = cake.name
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
-    const matchesEvent =
-      selectedEvent === "All" || cake.event === selectedEvent;
     const matchesFlavor =
-      selectedFlavor === "All" || cake.flavor === selectedFlavor;
-    const matchesPriceRange =
-      selectedPriceRange === "All" || cake.priceRange === selectedPriceRange;
-    const matchesTime = selectedTime === "All" || cake.time === selectedTime;
+      selectedFlavor === "All" ||
+      cake.specifications?.flavors?.some((f) =>
+        f.toLowerCase().includes(selectedFlavor.toLowerCase())
+      );
+    const matchesTime =
+      selectedTime === "All" || cake.preparationTime === selectedTime;
     const matchesCovering =
-      selectedCovering === "All" || cake.covering === selectedCovering;
+      selectedCovering === "All" ||
+      cake.specifications?.covering === selectedCovering;
 
-    return (
-      matchesSearch &&
-      matchesEvent &&
-      matchesFlavor &&
-      matchesPriceRange &&
-      matchesTime &&
-      matchesCovering
-    );
+    return matchesFlavor && matchesTime && matchesCovering;
   });
 
   const handleCakeClick = (cake) => {
@@ -325,27 +304,85 @@ const ModifyCake = () => {
             </div>
           </div>
 
-          {/* Search Button */}
-          <button className="bg-[#FF5722] hover:bg-[#FF5722]/90 text-white px-6 py-2 rounded-full flex items-center gap-2 transition-colors">
+          <button
+            onClick={() => setCurrentPage(1)}
+            className="bg-[#FF5722] hover:bg-[#FF5722]/90 text-white px-6 py-2 rounded-full flex items-center gap-2 transition-colors cursor-pointer"
+          >
             <Search className="w-4 h-4" />
           </button>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          {filteredCakes.map((cake) => (
+        {isLoading ? (
+          <div className="flex justify-center items-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FF5722]"></div>
+          </div>
+        ) : filteredCakes.length === 0 ? (
+          <div className="text-center py-20">
+            <p className="text-gray-500 text-lg mb-4">
+              No cakes found matching your criteria
+            </p>
             <button
-              key={cake.id}
-              onClick={() => handleCakeClick(cake)}
-              className="aspect-square rounded-lg overflow-hidden hover:opacity-80 transition-opacity cursor-pointer"
+              onClick={() => {
+                setSelectedEvent("All");
+                setSelectedFlavor("All");
+                setSelectedPriceRange("All");
+                setSelectedTime("All");
+                setSelectedCovering("All");
+                setSearchQuery("");
+              }}
+              className="text-[#FF5722] hover:underline"
             >
-              <img
-                src={cake.image}
-                alt={cake.name}
-                className="w-full h-full object-cover"
-              />
+              Clear all filters
             </button>
-          ))}
-        </div>
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              {filteredCakes.map((cake) => (
+                <button
+                  key={cake._id || cake.id}
+                  onClick={() => handleCakeClick(cake)}
+                  className="aspect-square rounded-lg overflow-hidden hover:opacity-80 transition-opacity cursor-pointer"
+                >
+                  <img
+                    src={
+                      cake.image ||
+                      "https://via.placeholder.com/300?text=No+Image"
+                    }
+                    alt={cake.name}
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+
+            {totalPages > 1 && (
+              <div className="flex justify-center items-center gap-4 mb-6">
+                <button
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                  }
+                  disabled={currentPage === 1}
+                  className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Previous
+                </button>
+                <span className="text-gray-600">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <button
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                  }
+                  disabled={currentPage === totalPages}
+                  className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Next
+                </button>
+              </div>
+            )}
+          </>
+        )}
 
         <div className="text-center space-y-4">
           <p className="text-lg font-semibold">
@@ -373,32 +410,56 @@ const ModifyCake = () => {
             <div className="flex flex-col md:flex-row gap-6">
               <div className="md:w-1/2">
                 <img
-                  src={selectedCake.image}
+                  src={
+                    selectedCake.image ||
+                    "https://via.placeholder.com/400?text=No+Image"
+                  }
                   alt={selectedCake.name}
                   className="w-full rounded-lg"
                 />
               </div>
 
               <div className="md:w-1/2 text-white">
+                <h2 className="text-2xl font-bold mb-4">{selectedCake.name}</h2>
+
                 <div className="flex flex-wrap gap-2 mb-4">
-                  {selectedCake.tags.map((tag, index) => (
-                    <span
-                      key={index}
-                      className="bg-white text-black px-3 py-1 rounded-full text-sm"
-                    >
-                      {tag}
+                  {selectedCake.specifications?.shape && (
+                    <span className="bg-white text-black px-3 py-1 rounded-full text-sm">
+                      {selectedCake.specifications.shape}
                     </span>
-                  ))}
+                  )}
+                  {selectedCake.specifications?.numberOfTiers && (
+                    <span className="bg-white text-black px-3 py-1 rounded-full text-sm">
+                      {selectedCake.specifications.numberOfTiers} Tier
+                      {selectedCake.specifications.numberOfTiers > 1 ? "s" : ""}
+                    </span>
+                  )}
+                  {selectedCake.specifications?.covering && (
+                    <span className="bg-white text-black px-3 py-1 rounded-full text-sm">
+                      {selectedCake.specifications.covering}
+                    </span>
+                  )}
+                  {selectedCake.category && (
+                    <span className="bg-white text-black px-3 py-1 rounded-full text-sm">
+                      {selectedCake.category}
+                    </span>
+                  )}
                 </div>
 
-                <p className="text-sm mb-6 leading-relaxed">
-                  {selectedCake.description}
+                <p className="text-sm mb-4 leading-relaxed">
+                  {selectedCake.description || selectedCake.fullDescription}
                 </p>
 
-                <p className="text-sm mb-6">
-                  Cake ID:{" "}
-                  <span className="font-semibold">{selectedCake.cakeId}</span>
-                </p>
+                {selectedCake.priceNGN && (
+                  <p className="text-lg font-bold mb-4">
+                    ₦{selectedCake.priceNGN.toLocaleString()}
+                    {selectedCake.price && (
+                      <span className="text-sm text-gray-400 ml-2">
+                        (${selectedCake.price.toLocaleString()})
+                      </span>
+                    )}
+                  </p>
+                )}
 
                 <button
                   onClick={handleConfirmSelection}
