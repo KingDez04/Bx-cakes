@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import Footer from "../Footer/Footer";
 import TopReviews from "../TopReviews/TopReviews";
 import bg from "../../assets/heading.png";
@@ -17,8 +18,49 @@ import readyMadeCake from "../../assets/readymadeCake.png";
 
 const Home = () => {
   const [selectedOption, setSelectedOption] = useState(null);
+  const [categoryCounts, setCategoryCounts] = useState({
+    "Birthday Cakes": 0,
+    "Wedding Cakes": 0,
+    "Custom Cakes": 0,
+    Cupcakes: 0,
+  });
 
-  // Options data with descriptions
+  const API_BASE_URL = "https://bx-cakes-backend.onrender.com/api";
+
+  useEffect(() => {
+    const fetchCategoryCounts = async () => {
+      const categoryNames = [
+        "Birthday Cakes",
+        "Wedding Cakes",
+        "Custom Cakes",
+        "Cupcakes",
+      ];
+
+      try {
+        const countPromises = categoryNames.map(async (categoryName) => {
+          const response = await axios.get(`${API_BASE_URL}/cakes/ready-made`, {
+            params: { category: categoryName, limit: 1 },
+          });
+          return {
+            name: categoryName,
+            count: response.data?.data?.pagination?.totalItems || 0,
+          };
+        });
+
+        const results = await Promise.all(countPromises);
+        const newCounts = {};
+        results.forEach((result) => {
+          newCounts[result.name] = result.count;
+        });
+        setCategoryCounts(newCounts);
+      } catch (error) {
+        console.error("Error fetching category counts:", error);
+      }
+    };
+
+    fetchCategoryCounts();
+  }, []);
+
   const orderOptions = {
     custom: {
       title: "Custom Cake",
@@ -41,15 +83,18 @@ const Home = () => {
   };
 
   const categories = [
-    { name: "Birthday Cakes", image: cake1, count: 25 },
-    { name: "Wedding Cakes", image: cake2, count: 18 },
-    { name: "Custom Cakes", image: cake3, count: 30 },
-    { name: "Cupcakes", image: cake4, count: 40 },
+    { name: "Birthday Cakes", image: cake1 },
+    { name: "Wedding Cakes", image: cake2 },
+    { name: "Custom Cakes", image: cake3 },
+    { name: "Cupcakes", image: cake4 },
   ];
 
   return (
     <div className="font-tertiary min-h-screen">
-      <section className="text-white max-h-[503px]" style={{ backgroundImage: `url(${bg})` }}>
+      <section
+        className="text-white max-h-[503px]"
+        style={{ backgroundImage: `url(${bg})` }}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
@@ -147,7 +192,9 @@ const Home = () => {
                 <h3 className="font-semibold text-lg mb-1 group-hover:text-pink-600 transition-colors">
                   {category.name}
                 </h3>
-                <p className="text-gray-500 text-sm">{category.count} items</p>
+                <p className="text-gray-500 text-sm">
+                  {categoryCounts[category.name]} items
+                </p>
               </Link>
             ))}
           </div>
