@@ -1,13 +1,19 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Paperclip, Plus, Minus } from "lucide-react";
+import { toast } from "react-hot-toast";
+import axios from "axios";
 import AdminSidebar from "../AdminSidebar/AdminSidebar";
+
+const API_BASE_URL = "https://bx-cakes-backend.onrender.com/api";
 
 const AdminAddReadyMadeCake = () => {
   const navigate = useNavigate();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     cakeName: "",
     cakePrice: "",
@@ -27,6 +33,7 @@ const AdminAddReadyMadeCake = () => {
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
+      setImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);
@@ -35,14 +42,109 @@ const AdminAddReadyMadeCake = () => {
     }
   };
 
-  const incrementQuantity = () => setQuantity(quantity + 1);
+  const incrementQuantity = () => {
+    setQuantity(quantity + 1);
+    setFormData({ ...formData, quantity: quantity + 1 });
+  };
   const decrementQuantity = () => {
-    if (quantity > 1) setQuantity(quantity - 1);
+    if (quantity > 1) {
+      setQuantity(quantity - 1);
+      setFormData({ ...formData, quantity: quantity - 1 });
+    }
   };
 
-  const handleSubmit = () => {
-    // TODO: Handle form submission - send data to backend API
-    // const formDataToSubmit = { ...formData, quantity };
+  const handleSubmit = async () => {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      toast.error("Please log in");
+      navigate("/login");
+      return;
+    }
+
+    if (!imageFile) {
+      toast.error("Please upload a cake image");
+      return;
+    }
+
+    if (
+      !formData.cakeName ||
+      !formData.cakePrice ||
+      !formData.shapeOfCake ||
+      !formData.numberOfTiers ||
+      !formData.coveringType
+    ) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const submitData = new FormData();
+      submitData.append("images", imageFile);
+      submitData.append("name", formData.cakeName);
+      submitData.append("priceNGN", formData.cakePrice);
+      submitData.append("stockQuantity", quantity);
+      submitData.append("shape", formData.shapeOfCake);
+      submitData.append("numberOfTiers", formData.numberOfTiers);
+      submitData.append("covering", formData.coveringType);
+
+      submitData.append("tiers[0][tierNumber]", 1);
+      submitData.append(
+        "tiers[0][size]",
+        formData.tier1.diameter || formData.tier1.width
+      );
+      submitData.append(
+        "tiers[0][numberOfFlavors]",
+        formData.tier1.numberOfFlavours || 1
+      );
+
+      if (formData.tier1.flavourSpecification) {
+        const flavors = formData.tier1.flavourSpecification
+          .split(",")
+          .map((f) => f.trim());
+        flavors.forEach((flavor, index) => {
+          submitData.append(`tiers[0][flavors][${index}][name]`, flavor);
+          submitData.append(
+            `tiers[0][flavors][${index}][percentage]`,
+            100 / flavors.length
+          );
+        });
+      }
+
+      const response = await axios.post(
+        `${API_BASE_URL}/admin/ready-made-cakes`,
+        submitData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      if (response.data.success) {
+        toast.success("Ready-made cake added successfully!");
+        setTimeout(() => {
+          navigate("/admin/ready-made-cakes");
+        }, 1500);
+      }
+    } catch (error) {
+      console.error("Add cake error:", error);
+
+      if (error.response?.status === 401) {
+        toast.error("Session expired. Please log in again.");
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("user");
+        navigate("/login");
+      } else if (error.response?.data?.errors) {
+        error.response.data.errors.forEach((err) => toast.error(err.msg));
+      } else {
+        toast.error(error.response?.data?.message || "Failed to add cake");
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -66,9 +168,10 @@ const AdminAddReadyMadeCake = () => {
           </div>
           <button
             onClick={handleSubmit}
-            className="w-full sm:w-auto px-6 md:px-8 py-2.5 md:py-3 bg-[#FF6B3D] text-white rounded-md hover:bg-[#FF5722] transition-colors font-medium cursor-pointer"
+            disabled={isSubmitting}
+            className="w-full sm:w-auto px-6 md:px-8 py-2.5 md:py-3 bg-[#FF6B3D] text-white rounded-md hover:bg-[#FF5722] transition-colors font-medium cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Confirm Cake
+            {isSubmitting ? "Adding Cake..." : "Confirm Cake"}
           </button>
         </div>
 

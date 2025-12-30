@@ -1,7 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, Trash2, RotateCcw } from "lucide-react";
+import { toast } from "react-hot-toast";
+import axios from "axios";
 import AdminSidebar from "../AdminSidebar/AdminSidebar";
+
+const API_BASE_URL = "https://bx-cakes-backend.onrender.com/api";
 
 const AdminReadyMadeCakes = () => {
   const navigate = useNavigate();
@@ -15,9 +19,72 @@ const AdminReadyMadeCakes = () => {
   const [timeFilter, setTimeFilter] = useState("All");
   const [coveringFilter, setCoveringFilter] = useState("All");
   const [ageFilter, setAgeFilter] = useState("And");
+  const [cakes, setCakes] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-  // Sample cakes data
-  const cakes = [
+  useEffect(() => {
+    fetchReadyMadeCakes();
+  }, [currentPage, eventFilter, genderFilter, coveringFilter, priceFilter]);
+
+  const fetchReadyMadeCakes = async () => {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      toast.error("Please log in");
+      navigate("/login");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      let url = `${API_BASE_URL}/admin/ready-made-cakes?page=${currentPage}&limit=12`;
+
+      if (eventFilter !== "All") {
+        url += `&event=${eventFilter}`;
+      }
+      if (genderFilter !== "All") {
+        url += `&gender=${genderFilter}`;
+      }
+      if (coveringFilter !== "All") {
+        url += `&covering=${coveringFilter}`;
+      }
+      if (priceFilter !== "All") {
+        if (priceFilter === "Under ₦50,000") {
+          url += `&maxPrice=50000`;
+        } else if (priceFilter === "₦50,000 - ₦100,000") {
+          url += `&minPrice=50000&maxPrice=100000`;
+        } else if (priceFilter === "Over ₦100,000") {
+          url += `&minPrice=100000`;
+        }
+      }
+
+      const response = await axios.get(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (response.data.success) {
+        setCakes(response.data.data.cakes);
+        setTotalPages(response.data.data.totalPages || 1);
+      }
+    } catch (error) {
+      console.error("Fetch cakes error:", error);
+
+      if (error.response?.status === 401) {
+        toast.error("Session expired. Please log in again.");
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("user");
+        navigate("/login");
+      } else {
+        toast.error(error.response?.data?.message || "Failed to fetch cakes");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  cakes = [
     {
       id: 1,
       image:
@@ -91,10 +158,39 @@ const AdminReadyMadeCakes = () => {
     }
   };
 
-  const handleConfirmDelete = () => {
-    // Handle delete logic
-    setShowDeleteModal(false);
-    setSelectedCakes([]);
+  const handleConfirmDelete = async () => {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      toast.error("Please log in");
+      navigate("/login");
+      return;
+    }
+
+    try {
+      await Promise.all(
+        selectedCakes.map((cakeId) =>
+          axios.delete(`${API_BASE_URL}/admin/ready-made-cakes/${cakeId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          })
+        )
+      );
+
+      toast.success("Cakes deleted successfully");
+      setShowDeleteModal(false);
+      setSelectedCakes([]);
+      fetchReadyMadeCakes();
+    } catch (error) {
+      console.error("Delete error:", error);
+
+      if (error.response?.status === 401) {
+        toast.error("Session expired. Please log in again.");
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("user");
+        navigate("/login");
+      } else {
+        toast.error(error.response?.data?.message || "Failed to delete cakes");
+      }
+    }
   };
 
   return (

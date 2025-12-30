@@ -1,4 +1,4 @@
-const OrdersTable = ({ orders }) => {
+const OrdersTable = ({ orders, onStatusUpdate }) => {
   const getStatusBgColor = (status) => {
     switch (status) {
       case "Pending Confirmation":
@@ -12,6 +12,18 @@ const OrdersTable = ({ orders }) => {
         return "bg-blue-100 text-blue-800";
       default:
         return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const handleStatusChange = (orderId, newStatus) => {
+    if (onStatusUpdate) {
+      const statusMap = {
+        "Pending Confirmation": "pending",
+        "In Progress": "processing",
+        Completed: "completed",
+        Cancelled: "cancelled",
+      };
+      onStatusUpdate(orderId, statusMap[newStatus] || newStatus);
     }
   };
 
@@ -69,13 +81,32 @@ const OrdersTable = ({ orders }) => {
                   {order.deliveryDate}
                 </td>
                 <td className="px-2 md:px-3 lg:px-4 py-2 md:py-3">
-                  <span
-                    className={`inline-block px-1.5 md:px-2 lg:px-3 py-0.5 md:py-1 rounded-full text-[9px] md:text-[10px] lg:text-xs font-medium whitespace-nowrap ${getStatusBgColor(
-                      order.status
-                    )}`}
-                  >
-                    {order.status}
-                  </span>
+                  {onStatusUpdate ? (
+                    <select
+                      value={order.status}
+                      onChange={(e) =>
+                        handleStatusChange(order._id, e.target.value)
+                      }
+                      className={`inline-block px-1.5 md:px-2 lg:px-3 py-0.5 md:py-1 rounded-full text-[9px] md:text-[10px] lg:text-xs font-medium whitespace-nowrap border-0 cursor-pointer ${getStatusBgColor(
+                        order.status
+                      )}`}
+                    >
+                      <option value="Pending Confirmation">
+                        Pending Confirmation
+                      </option>
+                      <option value="In Progress">In Progress</option>
+                      <option value="Completed">Completed</option>
+                      <option value="Cancelled">Cancelled</option>
+                    </select>
+                  ) : (
+                    <span
+                      className={`inline-block px-1.5 md:px-2 lg:px-3 py-0.5 md:py-1 rounded-full text-[9px] md:text-[10px] lg:text-xs font-medium whitespace-nowrap ${getStatusBgColor(
+                        order.status
+                      )}`}
+                    >
+                      {order.status}
+                    </span>
+                  )}
                 </td>
                 <td className="px-2 md:px-3 lg:px-4 py-2 md:py-3 hidden sm:table-cell">
                   <div className="flex items-center gap-1 md:gap-2">
