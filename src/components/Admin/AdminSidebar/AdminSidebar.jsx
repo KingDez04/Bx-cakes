@@ -1,5 +1,14 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Image, FileText, Upload, LogOut, Menu, X } from "lucide-react";
+import {
+  Home,
+  Image,
+  FileText,
+  Upload,
+  LogOut,
+  Menu,
+  X,
+  ArrowLeft,
+} from "lucide-react";
 import { useState, useEffect } from "react";
 import bxLogo from "../../../assets/bx-logo.png";
 
@@ -112,6 +121,24 @@ const AdminSidebar = ({ onToggle }) => {
 
         <nav className="flex-1 py-6">
           <ul className="space-y-1">
+            <li>
+              <Link
+                to="/"
+                onClick={closeMobileMenu}
+                className={`flex items-center gap-3 py-3 mx-5 rounded-[10px] transition-colors text-gray-400 hover:bg-gray-900 hover:text-white ${
+                  isCollapsed ? "justify-center px-3" : "px-6"
+                }`}
+                title={isCollapsed ? "Back to Homepage" : ""}
+              >
+                <ArrowLeft className="w-5 h-5" />
+                {!isCollapsed && (
+                  <span className="text-sm font-medium">Back to Homepage</span>
+                )}
+              </Link>
+            </li>
+            <li className="mx-5 my-2">
+              <div className="border-t border-gray-800"></div>
+            </li>
             {menuItems.map((item) => {
               const Icon = item.icon;
               const active = isActive(item.path);

@@ -37,6 +37,9 @@ const NavBar = () => {
     { name: "Shop Our Ready Made Cakes", path: "/readymade-cake" },
   ];
 
+  const adminLink =
+    user?.role === "admin" ? { name: "Admin Dashboard", path: "/admin" } : null;
+
   return (
     <nav className="font-main bg-black sticky top-0 z-50">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
@@ -60,6 +63,15 @@ const NavBar = () => {
                 {link.name}
               </Link>
             ))}
+            {adminLink && (
+              <Link
+                to={adminLink.path}
+                onClick={handleLinkClick}
+                className="text-white hover:text-[#FD5A2F] transition-colors text-[18px] font-normal whitespace-nowrap"
+              >
+                {adminLink.name}
+              </Link>
+            )}
           </div>
 
           <div className="flex items-center space-x-4">
@@ -101,6 +113,15 @@ const NavBar = () => {
                   {link.name}
                 </Link>
               ))}
+              {adminLink && (
+                <Link
+                  to={adminLink.path}
+                  onClick={handleLinkClick}
+                  className="text-white hover:text-[#FD5A2F] hover:bg-gray-900 px-4 py-3 rounded-lg transition-colors text-base"
+                >
+                  {adminLink.name}
+                </Link>
+              )}
             </div>
           </div>
         )}
