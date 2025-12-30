@@ -2,14 +2,18 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Mail, ArrowLeft } from "lucide-react";
 import toast from "react-hot-toast";
+import axios from "axios";
 import bg from "../../../assets/authBackground.png";
+
+const API_BASE_URL = "https://bx-cakes-backend.onrender.com/api";
 
 const PasswordReset = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!email) {
@@ -17,13 +21,36 @@ const PasswordReset = () => {
       return;
     }
 
-    // Handle password reset
-    toast.success("Password reset link sent to your email!");
-    setIsSubmitted(true);
+    setIsSubmitting(true);
 
-    setTimeout(() => {
-      navigate("/login");
-    }, 3000);
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/auth/forgot-password`,
+        { email }
+      );
+
+      if (response.data.success) {
+        toast.success("Password reset link sent to your email!");
+        setIsSubmitted(true);
+
+        setTimeout(() => {
+          navigate("/login");
+        }, 3000);
+      }
+    } catch (error) {
+      console.error("Password reset error:", error);
+
+      if (error.response?.data?.errors) {
+        error.response.data.errors.forEach((err) => toast.error(err.msg));
+      } else {
+        toast.error(
+          error.response?.data?.message ||
+            "Failed to send reset link. Please try again."
+        );
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -72,9 +99,10 @@ const PasswordReset = () => {
 
               <button
                 type="submit"
-                className="w-full bg-[#FD5A2F] text-white text-base sm:text-lg lg:text-[19.04px] py-2.5 sm:py-3 rounded-full sm:rounded-[33.6px] font-semibold hover:bg-pink-700 transition-colors focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 cursor-pointer"
+                disabled={isSubmitting}
+                className="w-full bg-[#FD5A2F] text-white text-base sm:text-lg lg:text-[19.04px] py-2.5 sm:py-3 rounded-full sm:rounded-[33.6px] font-semibold hover:bg-pink-700 transition-colors focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Send Reset Link
+                {isSubmitting ? "Sending..." : "Send Reset Link"}
               </button>
             </form>
           ) : (

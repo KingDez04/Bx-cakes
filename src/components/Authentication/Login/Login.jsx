@@ -2,11 +2,15 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import toast from "react-hot-toast";
+import axios from "axios";
 import bg from "../../../assets/authBackground.png";
+
+const API_BASE_URL = "https://bx-cakes-backend.onrender.com/api";
 
 const Login = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -19,11 +23,40 @@ const Login = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // handle authentication
-    toast.success("Login successful!");
-    navigate("/");
+    setIsLoading(true);
+
+    try {
+      const response = await axios.post(`${API_BASE_URL}/auth/login`, formData);
+
+      if (response.data.success) {
+        const { token, user } = response.data.data;
+
+        localStorage.setItem("authToken", token);
+        localStorage.setItem("user", JSON.stringify(user));
+
+        toast.success(response.data.message || "Login successful!");
+
+        if (user.role === "ADMIN") {
+          navigate("/admin");
+        } else {
+          navigate("/");
+        }
+      }
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || "Login failed. Please try again.";
+      toast.error(errorMessage);
+
+      if (error.response?.data?.errors) {
+        error.response.data.errors.forEach((err) => {
+          toast.error(`${err.path}: ${err.message}`);
+        });
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -127,9 +160,10 @@ const Login = () => {
 
             <button
               type="submit"
-              className="w-full bg-[#FD5A2F] text-white text-base sm:text-lg lg:text-[19.04px] py-2.5 sm:py-3 rounded-full sm:rounded-[33.6px] font-semibold hover:bg-pink-700 transition-colors focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 cursor-pointer"
+              disabled={isLoading}
+              className="w-full bg-[#FD5A2F] text-white text-base sm:text-lg lg:text-[19.04px] py-2.5 sm:py-3 rounded-full sm:rounded-[33.6px] font-semibold hover:bg-pink-700 transition-colors focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Log In
+              {isLoading ? "Logging in..." : "Log In"}
             </button>
           </form>
 
