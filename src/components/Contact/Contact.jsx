@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { Mail, Phone, MapPin, Clock, Send } from "lucide-react";
+import axios from "axios";
 import TopReviews from "../TopReviews/TopReviews";
 import Footer from "../Footer/Footer";
 import bg from "../../assets/heading1.png";
 import bg2 from "../../assets/heading2.png";
 import toast from "react-hot-toast";
+
+const API_BASE_URL = "https://bx-cakes-backend.onrender.com/api";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -14,6 +17,7 @@ const Contact = () => {
     subject: "",
     message: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -22,17 +26,62 @@ const Contact = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // send the form data to the backend
-    toast.success("Message sent! We'll get back to you soon.");
-    setFormData({
-      name: "",
-      email: "",
-      phone: "",
-      subject: "",
-      message: "",
-    });
+
+    if (!formData.name || formData.name.length < 2) {
+      toast.error("Please enter your name (at least 2 characters)");
+      return;
+    }
+    if (!formData.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+    if (!formData.subject || formData.subject.length < 3) {
+      toast.error("Please enter a subject (at least 3 characters)");
+      return;
+    }
+    if (!formData.message || formData.message.length < 10) {
+      toast.error("Please enter a message (at least 10 characters)");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/contact/submit`,
+        formData
+      );
+
+      if (response.data.success) {
+        toast.success(
+          response.data.message || "Message sent! We'll get back to you soon."
+        );
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          subject: "",
+          message: "",
+        });
+      }
+    } catch (error) {
+      console.error("Error submitting contact form:", error);
+      if (error.response?.status === 429) {
+        toast.error("Too many requests. Please try again later.");
+      } else if (error.response?.status === 422) {
+        toast.error(
+          error.response.data.message || "Please check your form data"
+        );
+      } else {
+        toast.error(
+          error.response?.data?.message ||
+            "Failed to send message. Please try again."
+        );
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const contactInfo = [
@@ -217,10 +266,15 @@ const Contact = () => {
 
               <button
                 type="submit"
-                className="w-full bg-[#FD5A2F] text-white py-4 rounded-lg font-semibold hover:bg-[#FF5722]/90 transition-colors flex items-center justify-center space-x-2 cursor-pointer"
+                disabled={isSubmitting}
+                className={`w-full bg-[#FD5A2F] text-white py-4 rounded-lg font-semibold hover:bg-[#FF5722]/90 transition-colors flex items-center justify-center space-x-2 ${
+                  isSubmitting
+                    ? "opacity-50 cursor-not-allowed"
+                    : "cursor-pointer"
+                }`}
               >
                 <Send className="w-5 h-5" />
-                <span>Send Message</span>
+                <span>{isSubmitting ? "Sending..." : "Send Message"}</span>
               </button>
             </form>
           </div>

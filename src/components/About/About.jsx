@@ -1,9 +1,64 @@
+import { useState, useEffect } from "react";
 import { Award, Heart, Users, Clock } from "lucide-react";
+import axios from "axios";
 import TopReviews from "../TopReviews/TopReviews";
 import Footer from "../Footer/Footer";
 import bg from "../../assets/heading.png";
 
+const API_BASE_URL = "https://bx-cakes-backend.onrender.com/api";
+
 const About = () => {
+  const [stats, setStats] = useState({
+    totalCustomers: 50000,
+    totalOrders: 0,
+    averageRating: 4.9,
+    yearsOfExperience: 10,
+    uniqueRecipes: 100,
+  });
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  const fetchStats = async () => {
+    try {
+      const reviewsResponse = await axios.get(
+        `${API_BASE_URL}/reviews/top?limit=50`
+      );
+
+      if (
+        reviewsResponse.data.success &&
+        reviewsResponse.data.data.reviews.length > 0
+      ) {
+        const reviews = reviewsResponse.data.data.reviews;
+        const avgRating =
+          reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
+
+        setStats((prev) => ({
+          ...prev,
+          averageRating: avgRating.toFixed(1),
+        }));
+      }
+
+      const cachedCounts = localStorage.getItem("categoryCounts");
+      if (cachedCounts && cachedCounts !== "undefined") {
+        try {
+          const counts = JSON.parse(cachedCounts);
+          const totalCakes = Object.values(counts).reduce(
+            (sum, count) => sum + count,
+            0
+          );
+          if (totalCakes > 0) {
+            setStats((prev) => ({ ...prev, uniqueRecipes: totalCakes }));
+          }
+        } catch (e) {
+          console.error("Error parsing cached counts:", e);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching stats:", error);
+    }
+  };
   const values = [
     {
       icon: <Heart className="w-8 h-8 text-[#FD5A2F]" />,
@@ -162,19 +217,27 @@ const About = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-4 gap-8 text-center">
             <div>
-              <div className="text-4xl font-bold mb-2">10+</div>
+              <div className="text-4xl font-bold mb-2">
+                {stats.yearsOfExperience}+
+              </div>
               <div className="text-pink-100">Years of Experience</div>
             </div>
             <div>
-              <div className="text-4xl font-bold mb-2">50,000+</div>
+              <div className="text-4xl font-bold mb-2">
+                {stats.totalCustomers.toLocaleString()}+
+              </div>
               <div className="text-pink-100">Happy Customers</div>
             </div>
             <div>
-              <div className="text-4xl font-bold mb-2">100+</div>
+              <div className="text-4xl font-bold mb-2">
+                {stats.uniqueRecipes}+
+              </div>
               <div className="text-pink-100">Unique Recipes</div>
             </div>
             <div>
-              <div className="text-4xl font-bold mb-2">4.9</div>
+              <div className="text-4xl font-bold mb-2">
+                {stats.averageRating}
+              </div>
               <div className="text-pink-100">Average Rating</div>
             </div>
           </div>

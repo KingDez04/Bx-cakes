@@ -14,7 +14,8 @@
 10. [Admin Order History APIs](#admin-order-history-apis)
 11. [Review APIs](#review-apis)
 12. [File Upload APIs](#file-upload-apis)
-13. [Data Models](#data-models)
+13. [Contact Form API](#contact-form-api)
+14. [Data Models](#data-models)
 
 ---
 
@@ -1844,7 +1845,63 @@ category: string (optional)
 
 ---
 
-## 13. Data Models
+## 13. Contact Form API
+
+### 13.1 Submit Contact Form
+
+**Endpoint:** `POST /contact/submit`
+**Auth Required:** No
+
+**Request Body:**
+
+```json
+{
+  "name": "string (required, min: 2, max: 100)",
+  "email": "string (required, valid email)",
+  "phone": "string (optional, max: 20)",
+  "subject": "string (required, min: 3, max: 200)",
+  "message": "string (required, min: 10, max: 2000)"
+}
+```
+
+**Response (200):**
+
+```json
+{
+  "success": true,
+  "message": "Thank you for contacting us! We'll get back to you within 24-48 hours.",
+  "data": {
+    "contactId": "string (UUID)",
+    "submittedAt": "string (ISO 8601)"
+  }
+}
+```
+
+**Error Responses:**
+
+- 422: Validation error (missing required fields or invalid format)
+- 429: Too many requests (rate limited to 5 submissions per hour per IP)
+- 500: Server error (email service unavailable)
+
+**Implementation Notes:**
+
+- Rate limiting: Maximum 5 contact form submissions per hour per IP address
+- Email notification: Admin receives email notification for each submission
+- Auto-response: Customer receives confirmation email to provided email address
+- Data storage: Contact submissions stored in database for admin review
+- Spam protection: Consider implementing reCAPTCHA or similar protection
+
+**Example Email Flow:**
+
+1. Customer submits form
+2. Backend validates and stores submission
+3. Backend sends confirmation email to customer
+4. Backend sends notification email to admin (info@bxcakes.com)
+5. Admin can view submissions in admin panel (future feature)
+
+---
+
+## 14. Data Models
 
 ### User Model
 

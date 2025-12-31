@@ -56,16 +56,84 @@ const AdminCakeReview = () => {
     }
   };
 
-  const handleApprove = () => {
-    // TODO: Send approval to backend API
-    // await approveOrder(selectedOrder.id);
-    setSelectedOrder(null);
+  const handleApprove = async () => {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      toast.error("Please login to continue");
+      navigate("/login");
+      return;
+    }
+
+    const orderToApprove = selectedOrder || customerOrders[0];
+    if (!orderToApprove) return;
+
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/admin/customer-uploads/${orderToApprove.id}/approve`,
+        {
+          addToCatalog: false,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (response.data.success) {
+        toast.success("Order approved successfully!");
+        fetchReviews();
+        setSelectedOrder(null);
+      }
+    } catch (error) {
+      console.error("Error approving order:", error);
+      if (error.response?.status === 401) {
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("user");
+        toast.error("Session expired. Please login again");
+        navigate("/login");
+      } else {
+        toast.error(error.response?.data?.message || "Failed to approve order");
+      }
+    }
   };
 
-  const handleDecline = () => {
-    // TODO: Send decline to backend API
-    // await declineOrder(selectedOrder.id);
-    setSelectedOrder(null);
+  const handleDecline = async () => {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      toast.error("Please login to continue");
+      navigate("/login");
+      return;
+    }
+
+    const orderToDecline = selectedOrder || customerOrders[0];
+    if (!orderToDecline) return;
+
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/admin/customer-uploads/${orderToDecline.id}/decline`,
+        {
+          reason: "Does not meet quality standards",
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (response.data.success) {
+        toast.success("Order declined successfully!");
+        fetchReviews();
+        setSelectedOrder(null);
+      }
+    } catch (error) {
+      console.error("Error declining order:", error);
+      if (error.response?.status === 401) {
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("user");
+        toast.error("Session expired. Please login again");
+        navigate("/login");
+      } else {
+        toast.error(error.response?.data?.message || "Failed to decline order");
+      }
+    }
   };
 
   return (
