@@ -26,6 +26,7 @@ const Footer = () => {
             </p>
             <div className="flex space-x-4">
               <a
+                target="_blank"
                 href="#"
                 className="hover:text-[#FF673F] transition-colors"
                 aria-label="Facebook"
@@ -33,13 +34,15 @@ const Footer = () => {
                 <Facebook className="w-5 h-5" />
               </a>
               <a
-                href="#"
+                target="_blank"
+                href="https://www.instagram.com/bxbakesandmore?igsh=MWJocnB5M3oweWN4cQ=="
                 className="hover:text-[#FF673F] transition-colors"
                 aria-label="Instagram"
               >
                 <Instagram className="w-5 h-5" />
               </a>
               <a
+                target="_blank"
                 href="#"
                 className="hover:text-[#FF673F] transition-colors"
                 aria-label="Twitter"
