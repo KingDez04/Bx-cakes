@@ -1,68 +1,60 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import axios from "axios";
+import toast from "react-hot-toast";
 import AdminSidebar from "../AdminSidebar/AdminSidebar";
+
+const API_BASE_URL = "https://bx-cakes-backend.onrender.com/api";
 
 const AdminDeleteCustomerUploads = () => {
   const navigate = useNavigate();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [selectedCakes, setSelectedCakes] = useState([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [customerUploads, setCustomerUploads] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Sample customer uploads data
-  const customerUploads = [
-    {
-      id: 1,
-      image:
-        "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=500",
-      shape: "Circle",
-      size: 'Ø:8" H:10"',
-      tiers: "3 Tiers",
-      tier1Flavor: "Flavour(s): 2",
-      tier1Measurement: "Measurement: Ø-8 H:10 L-8 W:9",
-      tier1FlavorSpec: "Flavour Specification: Chocolate, Vanilla",
-      tier2Flavor: "Flavour(s): 1",
-      tier2Measurement: "Measurement: Ø-8 H:10 L-8 W:9",
-      tier2FlavorSpec: "Flavour Specification: Chocolate",
-      covering: "Fondant",
-      category: "Birthday Cake",
-      condition: "New",
-    },
-    {
-      id: 2,
-      image:
-        "https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=500",
-      shape: "Circle",
-      size: 'Ø:8" H:10"',
-      tiers: "3 Tiers",
-      tier1Flavor: "Flavour(s): 2",
-      tier1Measurement: "Measurement: Ø-8 H:10 L-8 W:9",
-      tier1FlavorSpec: "Flavour Specification: Chocolate, Vanilla",
-      tier2Flavor: "Flavour(s): 1",
-      tier2Measurement: "Measurement: Ø-8 H:10 L-8 W:9",
-      tier2FlavorSpec: "Flavour Specification: Chocolate",
-      covering: "Fondant",
-      category: "Birthday Cake",
-      condition: "New",
-    },
-    {
-      id: 3,
-      image:
-        "https://images.unsplash.com/photo-1588195538326-c5b1e5b680ab?w=500",
-      shape: "Circle",
-      size: 'Ø:8" H:10"',
-      tiers: "3 Tiers",
-      tier1Flavor: "Flavour(s): 2",
-      tier1Measurement: "Measurement: Ø-8 H:10 L-8 W:9",
-      tier1FlavorSpec: "Flavour Specification: Chocolate, Vanilla",
-      tier2Flavor: "Flavour(s): 1",
-      tier2Measurement: "Measurement: Ø-8 H:10 L-8 W:9",
-      tier2FlavorSpec: "Flavour Specification: Chocolate",
-      covering: "Fondant",
-      category: "Birthday Cake",
-      condition: "New",
-    },
-  ];
+  useEffect(() => {
+    fetchDeletedUploads();
+  }, []);
+
+  const fetchDeletedUploads = async () => {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      toast.error("Please login to continue");
+      navigate("/login");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/admin/customer-uploads/deleted`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (response.data.success) {
+        setCustomerUploads(response.data.data.uploads || []);
+      }
+    } catch (error) {
+      console.error("Error fetching deleted uploads:", error);
+      if (error.response?.status === 401) {
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("user");
+        toast.error("Session expired. Please login again");
+        navigate("/login");
+      } else {
+        toast.error(
+          error.response?.data?.message || "Failed to load deleted uploads"
+        );
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleSelectCake = (id) => {
     if (selectedCakes.includes(id)) {
@@ -79,7 +71,6 @@ const AdminDeleteCustomerUploads = () => {
   };
 
   const handleConfirmDelete = () => {
-    // Handle delete logic
     setShowDeleteModal(false);
     setSelectedCakes([]);
   };
@@ -124,10 +115,10 @@ const AdminDeleteCustomerUploads = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
             {customerUploads.map((cake) => (
               <div
-                key={cake.id}
-                onClick={() => handleSelectCake(cake.id)}
-                className={`bg-white rounded-lg overflow-hidden cursor-pointer transition-all ${
-                  selectedCakes.includes(cake.id)
+                key={cake._id || cake.id}
+                onClick={() => handleSelectCake(cake._id || cake.id)}
+                className={`relative aspect-square rounded-lg overflow-hidden cursor-pointer transition-all ${
+                  selectedCakes.includes(cake._id || cake.id)
                     ? "ring-4 ring-[#FF6B3D]"
                     : "border border-gray-200 hover:shadow-lg"
                 }`}

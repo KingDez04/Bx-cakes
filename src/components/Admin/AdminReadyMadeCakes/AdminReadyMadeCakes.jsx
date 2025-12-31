@@ -84,66 +84,6 @@ const AdminReadyMadeCakes = () => {
     }
   };
 
-  cakes = [
-    {
-      id: 1,
-      image:
-        "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=500",
-      name: "Drippy Strawberry Topping On A Red Velvet Cake",
-      tier1Flavor: "Flavour(s): 2",
-      tier1Measurement: "Measurement: Ø-8 H:10 L-8 W:9",
-      tier1FlavorSpec: "Flavour Specification: Vanilla, Chocolate",
-      tier2Flavor: "Flavour(s): 1",
-      tier2Measurement: "Measurement: Ø-8 H:10 L-8 W:9",
-      tier2FlavorSpec: "Flavour Specification: Chocolate",
-      covering: "Fondant",
-      category: "Birthday Cake",
-      condition: "New",
-      gender: "Female",
-      availability: "Ready Made",
-      stock: 1,
-      price: 20000,
-    },
-    {
-      id: 2,
-      image:
-        "https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=500",
-      name: "Drippy Strawberry Topping On A Red Velvet Cake",
-      tier1Flavor: "Flavour(s): 2",
-      tier1Measurement: "Measurement: Ø-8 H:10 L-8 W:9",
-      tier1FlavorSpec: "Flavour Specification: Vanilla, Chocolate",
-      tier2Flavor: "Flavour(s): 1",
-      tier2Measurement: "Measurement: Ø-8 H:10 L-8 W:9",
-      tier2FlavorSpec: "Flavour Specification: Chocolate",
-      covering: "Fondant",
-      category: "Birthday Cake",
-      condition: "New",
-      gender: "Female",
-      availability: "Ready Made",
-      stock: 1,
-      price: 20000,
-    },
-    {
-      id: 3,
-      image:
-        "https://images.unsplash.com/photo-1588195538326-c5b1e5b680ab?w=500",
-      name: "Drippy Strawberry Topping On A Red Velvet Cake",
-      tier1Flavor: "Flavour(s): 2",
-      tier1Measurement: "Measurement: Ø-8 H:10 L-8 W:9",
-      tier1FlavorSpec: "Flavour Specification: Vanilla, Chocolate",
-      tier2Flavor: "Flavour(s): 1",
-      tier2Measurement: "Measurement: Ø-8 H:10 L-8 W:9",
-      tier2FlavorSpec: "Flavour Specification: Chocolate",
-      covering: "Fondant",
-      category: "Birthday Cake",
-      condition: "New",
-      gender: "Female",
-      availability: "Ready Made",
-      stock: 1,
-      price: 20000,
-    },
-  ];
-
   const handleSelectCake = (id) => {
     if (selectedCakes.includes(id)) {
       setSelectedCakes(selectedCakes.filter((cakeId) => cakeId !== id));
@@ -404,7 +344,7 @@ const AdminReadyMadeCakes = () => {
                     className="w-full h-full object-cover"
                   />
 
-                  {hoveredCake === cake.id && (
+                  {hoveredCake === (cake._id || cake.id) && (
                     <div className="absolute inset-0 bg-black/70 flex flex-col justify-end p-4 gap-2">
                       <button className="w-full py-2 bg-[#FF6B3D] text-white rounded-md text-sm font-medium hover:bg-[#FF5722] transition-colors cursor-pointer">
                         Edit Cake

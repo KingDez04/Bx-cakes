@@ -1,7 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import axios from "axios";
+import toast from "react-hot-toast";
 import AdminSidebar from "../AdminSidebar/AdminSidebar";
+
+const API_BASE_URL = "https://bx-cakes-backend.onrender.com/api";
 
 const AdminDeletedReadyMadeCakes = () => {
   const navigate = useNavigate();
@@ -10,73 +14,52 @@ const AdminDeletedReadyMadeCakes = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showRecoverModal, setShowRecoverModal] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState("All");
+  const [deletedCakes, setDeletedCakes] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Sample deleted cakes data
-  const deletedCakes = [
-    {
-      id: 1,
-      image:
-        "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=500",
-      name: "Drippy Strawberry Topping On A Red Velvet Cake",
-      shape: "Circle",
-      size: 'Ø:8" H:10"',
-      tiers: "3 Tiers",
-      tier1Flavor: "Flavour(s): 2",
-      tier1Measurement: "Measurement: Ø-8 H:10 L-8 W:9",
-      tier1FlavorSpec: "Flavour Specification: Vanilla, Chocolate",
-      tier2Flavor: "Flavour(s): 1",
-      tier2Measurement: "Measurement: Ø-8 H:10 L-8 W:9",
-      tier2FlavorSpec: "Flavour Specification: Chocolate",
-      covering: "Fondant",
-      category: "Birthday Cake",
-      condition: "New",
-      gender: "Female",
-      stock: 1,
-      price: 20000,
-    },
-    {
-      id: 2,
-      image:
-        "https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=500",
-      name: "Drippy Strawberry Topping On A Red Velvet Cake",
-      shape: "Circle",
-      size: 'Ø:8" H:10"',
-      tiers: "3 Tiers",
-      tier1Flavor: "Flavour(s): 2",
-      tier1Measurement: "Measurement: Ø-8 H:10 L-8 W:9",
-      tier1FlavorSpec: "Flavour Specification: Vanilla, Chocolate",
-      tier2Flavor: "Flavour(s): 1",
-      tier2Measurement: "Measurement: Ø-8 H:10 L-8 W:9",
-      tier2FlavorSpec: "Flavour Specification: Chocolate",
-      covering: "Fondant",
-      category: "Birthday Cake",
-      condition: "New",
-      gender: "Female",
-      stock: 1,
-      price: 20000,
-    },
-    {
-      id: 3,
-      image:
-        "https://images.unsplash.com/photo-1588195538326-c5b1e5b680ab?w=500",
-      name: "Drippy Strawberry Topping On A Red Velvet Cake",
-      shape: "Circle",
-      size: 'Ø:8" H:10"',
-      tiers: "3 Tiers",
-      tier1Flavor: "Flavour(s): 2",
-      tier1Measurement: "Measurement: Ø-8 H:10 L-8 W:9",
-      tier1FlavorSpec: "Flavour Specification: Vanilla, Chocolate",
-      tier2Flavor: "Flavour(s): 1",
-      tier2Measurement: "Measurement: Ø-8 H:10 L-8 W:9",
-      tier2FlavorSpec: "Flavour Specification: Chocolate",
-      covering: "Fondant",
-      category: "Birthday Cake",
-      condition: "New",
-      gender: "Female",
-      stock: 1,
-      price: 20000,
-    },
-  ];
+  useEffect(() => {
+    fetchDeletedCakes();
+  }, [categoryFilter]);
+
+  const fetchDeletedCakes = async () => {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      toast.error("Please login to continue");
+      navigate("/login");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const params =
+        categoryFilter !== "All" ? { category: categoryFilter } : {};
+      const response = await axios.get(
+        `${API_BASE_URL}/admin/ready-made-cakes/deleted`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          params,
+        }
+      );
+
+      if (response.data.success) {
+        setDeletedCakes(response.data.data.cakes || []);
+      }
+    } catch (error) {
+      console.error("Error fetching deleted cakes:", error);
+      if (error.response?.status === 401) {
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("user");
+        toast.error("Session expired. Please login again");
+        navigate("/login");
+      } else {
+        toast.error(
+          error.response?.data?.message || "Failed to load deleted cakes"
+        );
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleSelectCake = (id) => {
     if (selectedCakes.includes(id)) {
@@ -92,22 +75,85 @@ const AdminDeletedReadyMadeCakes = () => {
     }
   };
 
+  const handleConfirmDelete = async () => {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      toast.error("Please login");
+      navigate("/login");
+      return;
+    }
+
+    try {
+      await Promise.all(
+        selectedCakes.map((cakeId) =>
+          axios.delete(
+            `${API_BASE_URL}/admin/ready-made-cakes/deleted/${cakeId}/permanent`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          )
+        )
+      );
+
+      toast.success("Cakes permanently deleted");
+      setShowDeleteModal(false);
+      setSelectedCakes([]);
+      fetchDeletedCakes();
+    } catch (error) {
+      console.error("Delete error:", error);
+      if (error.response?.status === 401) {
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("user");
+        toast.error("Session expired. Please login again");
+        navigate("/login");
+      } else {
+        toast.error(error.response?.data?.message || "Failed to delete cakes");
+      }
+    }
+  };
+
   const handleRecover = () => {
     if (selectedCakes.length > 0) {
       setShowRecoverModal(true);
     }
   };
 
-  const handleConfirmDelete = () => {
-    // Handle permanent delete logic
-    setShowDeleteModal(false);
-    setSelectedCakes([]);
-  };
+  const handleConfirmRecover = async () => {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      toast.error("Please login");
+      navigate("/login");
+      return;
+    }
 
-  const handleConfirmRecover = () => {
-    // Handle recover logic
-    setShowRecoverModal(false);
-    setSelectedCakes([]);
+    try {
+      await Promise.all(
+        selectedCakes.map((cakeId) =>
+          axios.post(
+            `${API_BASE_URL}/admin/ready-made-cakes/deleted/${cakeId}/recover`,
+            {},
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          )
+        )
+      );
+
+      toast.success("Cakes recovered successfully");
+      setShowRecoverModal(false);
+      setSelectedCakes([]);
+      fetchDeletedCakes();
+    } catch (error) {
+      console.error("Recover error:", error);
+      if (error.response?.status === 401) {
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("user");
+        toast.error("Session expired. Please login again");
+        navigate("/login");
+      } else {
+        toast.error(error.response?.data?.message || "Failed to recover cakes");
+      }
+    }
   };
 
   return (
@@ -188,128 +234,138 @@ const AdminDeletedReadyMadeCakes = () => {
         </div>
 
         <div className="p-4 md:p-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-            {deletedCakes.map((cake) => (
-              <div
-                key={cake.id}
-                onClick={() => handleSelectCake(cake.id)}
-                className={`bg-white rounded-lg overflow-hidden cursor-pointer transition-all ${
-                  selectedCakes.includes(cake.id)
-                    ? "ring-4 ring-[#FF6B3D]"
-                    : "border border-gray-200 hover:shadow-lg"
-                }`}
-              >
-                <div className="relative">
-                  <img
-                    src={cake.image}
-                    alt={cake.name}
-                    className="w-full h-64 object-cover"
-                  />
+          {isLoading ? (
+            <div className="flex justify-center items-center py-20">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FF6B3D]"></div>
+            </div>
+          ) : deletedCakes.length === 0 ? (
+            <div className="text-center py-20">
+              <p className="text-gray-500 text-lg">No deleted cakes found</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+              {deletedCakes.map((cake) => (
+                <div
+                  key={cake._id || cake.id}
+                  onClick={() => handleSelectCake(cake._id || cake.id)}
+                  className={`relative aspect-square rounded-lg overflow-hidden cursor-pointer transition-all ${
+                    selectedCakes.includes(cake._id || cake.id)
+                      ? "ring-4 ring-[#FF6B3D]"
+                      : "border border-gray-200 hover:shadow-lg"
+                  }`}
+                >
+                  <div className="relative">
+                    <img
+                      src={cake.image}
+                      alt={cake.name}
+                      className="w-full h-64 object-cover"
+                    />
+                  </div>
+                  <div className="p-4">
+                    <h3 className="font-semibold text-sm mb-3 line-clamp-2">
+                      {cake.name}
+                    </h3>
+
+                    <div className="flex items-center gap-4 mb-3 text-sm text-gray-700">
+                      <div className="flex items-center gap-1">
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle cx="12" cy="12" r="10" strokeWidth="2" />
+                        </svg>
+                        <span>{cake.shape}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                          />
+                        </svg>
+                        <span>{cake.size}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                          />
+                        </svg>
+                        <span>{cake.tiers}</span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2 mb-3 text-xs text-gray-600">
+                      <div>
+                        <div className="flex gap-2">
+                          <span className="font-medium">Tier 1</span>
+                          <span>{cake.tier1Flavor}</span>
+                        </div>
+                        <div className="ml-4">
+                          <div>{cake.tier1Measurement}</div>
+                          <div>{cake.tier1FlavorSpec}</div>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="flex gap-2">
+                          <span className="font-medium">Tier 2</span>
+                          <span>{cake.tier2Flavor}</span>
+                        </div>
+                        <div className="ml-4">
+                          <div>{cake.tier2Measurement}</div>
+                          <div>{cake.tier2FlavorSpec}</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      <span className="px-2 py-1 bg-pink-100 text-pink-800 rounded text-xs">
+                        {cake.covering}
+                      </span>
+                      <span className="px-2 py-1 bg-pink-100 text-pink-800 rounded text-xs">
+                        {cake.category}
+                      </span>
+                      <span className="px-2 py-1 bg-pink-100 text-pink-800 rounded text-xs">
+                        {cake.condition}
+                      </span>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      <span className="px-2 py-1 bg-pink-100 text-pink-800 rounded text-xs">
+                        {cake.gender}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <span className="text-green-600 text-sm font-medium">
+                        {cake.stock} Available
+                      </span>
+                      <span className="text-lg font-bold">
+                        NGN{cake.price.toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                <div className="p-4">
-                  <h3 className="font-semibold text-sm mb-3 line-clamp-2">
-                    {cake.name}
-                  </h3>
-
-                  <div className="flex items-center gap-4 mb-3 text-sm text-gray-700">
-                    <div className="flex items-center gap-1">
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle cx="12" cy="12" r="10" strokeWidth="2" />
-                      </svg>
-                      <span>{cake.shape}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                        />
-                      </svg>
-                      <span>{cake.size}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                        />
-                      </svg>
-                      <span>{cake.tiers}</span>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2 mb-3 text-xs text-gray-600">
-                    <div>
-                      <div className="flex gap-2">
-                        <span className="font-medium">Tier 1</span>
-                        <span>{cake.tier1Flavor}</span>
-                      </div>
-                      <div className="ml-4">
-                        <div>{cake.tier1Measurement}</div>
-                        <div>{cake.tier1FlavorSpec}</div>
-                      </div>
-                    </div>
-                    <div>
-                      <div className="flex gap-2">
-                        <span className="font-medium">Tier 2</span>
-                        <span>{cake.tier2Flavor}</span>
-                      </div>
-                      <div className="ml-4">
-                        <div>{cake.tier2Measurement}</div>
-                        <div>{cake.tier2FlavorSpec}</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    <span className="px-2 py-1 bg-pink-100 text-pink-800 rounded text-xs">
-                      {cake.covering}
-                    </span>
-                    <span className="px-2 py-1 bg-pink-100 text-pink-800 rounded text-xs">
-                      {cake.category}
-                    </span>
-                    <span className="px-2 py-1 bg-pink-100 text-pink-800 rounded text-xs">
-                      {cake.condition}
-                    </span>
-                  </div>
-
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    <span className="px-2 py-1 bg-pink-100 text-pink-800 rounded text-xs">
-                      {cake.gender}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <span className="text-green-600 text-sm font-medium">
-                      {cake.stock} Available
-                    </span>
-                    <span className="text-lg font-bold">
-                      NGN{cake.price.toLocaleString()}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 

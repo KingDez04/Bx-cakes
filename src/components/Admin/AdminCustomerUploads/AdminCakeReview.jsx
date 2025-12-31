@@ -1,80 +1,60 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import axios from "axios";
+import toast from "react-hot-toast";
 import AdminSidebar from "../AdminSidebar/AdminSidebar";
+
+const API_BASE_URL = "https://bx-cakes-backend.onrender.com/api";
 
 const AdminCakeReview = () => {
   const navigate = useNavigate();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [customerOrders, setCustomerOrders] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Sample customer orders data
-  const customerOrders = [
-    {
-      id: 1,
-      orderId: "12845",
-      customerName: "Grita Alexis",
-      location: "Ikoyi, Lagos",
-      orderDate: "20th July 2025",
-      image:
-        "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=500",
-      tags: ["Fondant", "Birthday Cake", "New", "Female", "Custom"],
-    },
-    {
-      id: 2,
-      orderId: "12845",
-      customerName: "Grita Alexis",
-      location: "Ikoyi, Lagos",
-      orderDate: "20th July 2025",
-      image: null,
-      tags: [],
-    },
-    {
-      id: 3,
-      orderId: "12845",
-      customerName: "Grita Alexis",
-      location: "Ikoyi, Lagos",
-      orderDate: "20th July 2025",
-      image: null,
-      tags: [],
-    },
-    {
-      id: 4,
-      orderId: "12845",
-      customerName: "Grita Alexis",
-      location: "Ikoyi, Lagos",
-      orderDate: "20th July 2025",
-      image: null,
-      tags: [],
-    },
-    {
-      id: 5,
-      orderId: "12845",
-      customerName: "Grita Alexis",
-      location: "Ikoyi, Lagos",
-      orderDate: "20th July 2025",
-      image: null,
-      tags: [],
-    },
-    {
-      id: 6,
-      orderId: "12845",
-      customerName: "Grita Alexis",
-      location: "Ikoyi, Lagos",
-      orderDate: "20th July 2025",
-      image: null,
-      tags: [],
-    },
-    {
-      id: 7,
-      orderId: "12845",
-      customerName: "Grita Alexis",
-      location: "Ikoyi, Lagos",
-      orderDate: "20th July 2025",
-      image: null,
-      tags: [],
-    },
-  ];
+  useEffect(() => {
+    fetchReviews();
+  }, []);
+
+  const fetchReviews = async () => {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      toast.error("Please login to continue");
+      navigate("/login");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/admin/customer-uploads/reviews`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (response.data.success) {
+        setCustomerOrders(response.data.data.orders || []);
+        if (response.data.data.orders?.length > 0 && !selectedOrder) {
+          setSelectedOrder(response.data.data.orders[0]);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching reviews:", error);
+      if (error.response?.status === 401) {
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("user");
+        toast.error("Session expired. Please login again");
+        navigate("/login");
+      } else {
+        toast.error(error.response?.data?.message || "Failed to load reviews");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleApprove = () => {
     // TODO: Send approval to backend API
@@ -114,10 +94,11 @@ const AdminCakeReview = () => {
             <div className="space-y-3">
               {customerOrders.map((order, index) => (
                 <div
-                  key={order.id}
+                  key={order._id || order.id}
                   onClick={() => setSelectedOrder(order)}
-                  className={`p-4 rounded-lg cursor-pointer transition-all ${
-                    selectedOrder?.id === order.id
+                  className={`p-4 border rounded-lg cursor-pointer transition-colors ${
+                    (selectedOrder?._id || selectedOrder?.id) ===
+                    (order._id || order.id)
                       ? "bg-[#FFB4A3]"
                       : index === 0
                       ? "bg-[#FFB4A3]"
