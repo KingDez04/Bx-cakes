@@ -162,7 +162,7 @@ const ProfilePage = () => {
         <div className="relative inline-block mb-6">
           <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-[#4A6B8A] bg-[#4A6B8A] mx-auto">
             <img
-              src={userData.profilePicture || dp}
+              src={userData.profileImage || dp}
               alt={userData.name}
               className="w-full h-full object-cover"
             />

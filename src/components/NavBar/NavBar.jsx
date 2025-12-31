@@ -86,7 +86,7 @@ const NavBar = () => {
               title={user ? `${user.name}'s Profile` : "Login"}
             >
               <img
-                src={user?.profilePicture || dp}
+                src={user?.profileImage || dp}
                 alt={user ? user.name : "Profile"}
                 className="w-full h-full object-cover"
               />

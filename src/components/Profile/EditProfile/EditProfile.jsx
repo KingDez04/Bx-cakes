@@ -17,11 +17,28 @@ const EditProfile = () => {
     profileImage: dp,
     address: "",
     personalNote: "",
-    phoneNumber: "",
   });
 
   useEffect(() => {
-    fetchUserProfile();
+    const cachedUser = localStorage.getItem("user");
+    if (cachedUser && cachedUser !== "undefined") {
+      try {
+        const user = JSON.parse(cachedUser);
+        setFormData({
+          name: user.name || "",
+          email: user.email || "",
+          profileImage: user.profileImage || dp,
+          address: user.address || "",
+          personalNote: user.personalNote || "",
+        });
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error parsing cached user:", error);
+        fetchUserProfile();
+      }
+    } else {
+      fetchUserProfile();
+    }
   }, []);
 
   const fetchUserProfile = async () => {
@@ -40,15 +57,15 @@ const EditProfile = () => {
       });
 
       if (response.data.success) {
-        const user = response.data.data.user;
+        const user = response.data.data;
         setFormData({
           name: user.name || "",
           email: user.email || "",
-          profileImage: user.profilePicture || dp,
+          profileImage: user.profileImage || dp,
           address: user.address || "",
           personalNote: user.personalNote || "",
-          phoneNumber: user.phoneNumber || "",
         });
+        localStorage.setItem("user", JSON.stringify(user));
       }
     } catch (error) {
       if (error.response?.status === 401) {
@@ -56,6 +73,23 @@ const EditProfile = () => {
         localStorage.removeItem("authToken");
         localStorage.removeItem("user");
         navigate("/login");
+      } else if (error.response?.status === 429) {
+        toast.error("Too many requests. Please try again in a moment.");
+        const cachedUser = localStorage.getItem("user");
+        if (cachedUser && cachedUser !== "undefined") {
+          try {
+            const user = JSON.parse(cachedUser);
+            setFormData({
+              name: user.name || "",
+              email: user.email || "",
+              profileImage: user.profileImage || dp,
+              address: user.address || "",
+              personalNote: user.personalNote || "",
+            });
+          } catch (e) {
+            console.error("Error parsing cached user:", e);
+          }
+        }
       } else {
         toast.error(error.response?.data?.message || "Failed to load profile");
       }
@@ -80,7 +114,6 @@ const EditProfile = () => {
       const updateData = {
         name: formData.name,
         address: formData.address,
-        phoneNumber: formData.phoneNumber,
         personalNote: formData.personalNote,
       };
 
@@ -189,7 +222,7 @@ const EditProfile = () => {
           </div>
           <button
             onClick={handleImageEdit}
-            className="absolute top-2 right-2 w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-lg hover:bg-gray-100 transition-colors"
+            className="absolute top-2 right-2 w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-lg hover:bg-gray-100 transition-colors cursor-pointer"
           >
             <Edit className="w-5 h-5 text-black" />
           </button>
@@ -201,7 +234,7 @@ const EditProfile = () => {
           </h1>
           <button
             onClick={handleNameEdit}
-            className="text-[#FF5722] hover:text-[#E64A19] transition-colors"
+            className="text-[#FF5722] hover:text-[#E64A19] transition-colors cursor-pointer"
           >
             <Edit className="w-5 h-5" />
           </button>
@@ -223,19 +256,6 @@ const EditProfile = () => {
                   onChange={handleChange}
                   className="w-full px-6 py-4 bg-[#E8E8E8] border-0 rounded-[30px] text-black text-base focus:outline-none focus:ring-2 focus:ring-[#FF5722]"
                   required
-                />
-              </div>
-
-              <div>
-                <label className="font-tertiary block text-[18.68px] font-semibold text-black mb-3">
-                  Phone Number
-                </label>
-                <input
-                  type="tel"
-                  name="phoneNumber"
-                  value={formData.phoneNumber}
-                  onChange={handleChange}
-                  className="w-full px-6 py-4 bg-[#E8E8E8] border-0 rounded-[30px] text-black text-base focus:outline-none focus:ring-2 focus:ring-[#FF5722]"
                 />
               </div>
 
@@ -264,22 +284,6 @@ const EditProfile = () => {
                   className="w-full px-6 py-4 bg-[#E8E8E8] border-0 rounded-[30px] text-black text-base focus:outline-none focus:ring-2 focus:ring-[#FF5722]"
                 />
               </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-32 gap-y-6 mb-20">
-              <div>
-                <label className="font-tertiary block text-[18.68px] font-semibold text-black mb-3">
-                  Phone Number
-                </label>
-                <input
-                  type="tel"
-                  name="phoneNumber"
-                  value={formData.phoneNumber}
-                  onChange={handleChange}
-                  className="w-full px-6 py-4 bg-[#E8E8E8] border-0 rounded-[30px] text-black text-base focus:outline-none focus:ring-2 focus:ring-[#FF5722]"
-                />
-              </div>
-              <div></div>
             </div>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 max-w-2xl mx-auto">

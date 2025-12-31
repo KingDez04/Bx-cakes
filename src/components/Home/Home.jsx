@@ -28,38 +28,50 @@ const Home = () => {
   const API_BASE_URL = "https://bx-cakes-backend.onrender.com/api";
 
   useEffect(() => {
-    const fetchCategoryCounts = async () => {
-      const categoryNames = [
-        "Birthday Cakes",
-        "Wedding Cakes",
-        "Custom Cakes",
-        "Cupcakes",
-      ];
-
+    // Try to load from cache first
+    const cachedCounts = localStorage.getItem("categoryCounts");
+    if (cachedCounts && cachedCounts !== "undefined") {
       try {
-        const countPromises = categoryNames.map(async (categoryName) => {
-          const response = await axios.get(`${API_BASE_URL}/cakes/ready-made`, {
-            params: { category: categoryName, limit: 1 },
-          });
-          return {
-            name: categoryName,
-            count: response.data?.data?.pagination?.totalItems || 0,
-          };
-        });
-
-        const results = await Promise.all(countPromises);
-        const newCounts = {};
-        results.forEach((result) => {
-          newCounts[result.name] = result.count;
-        });
-        setCategoryCounts(newCounts);
+        setCategoryCounts(JSON.parse(cachedCounts));
       } catch (error) {
-        console.error("Error fetching category counts:", error);
+        console.error("Error parsing cached counts:", error);
       }
-    };
+    }
 
     fetchCategoryCounts();
   }, []);
+
+  const fetchCategoryCounts = async () => {
+    const categoryNames = [
+      "Birthday Cakes",
+      "Wedding Cakes",
+      "Custom Cakes",
+      "Cupcakes",
+    ];
+
+    try {
+      const countPromises = categoryNames.map(async (categoryName) => {
+        const response = await axios.get(`${API_BASE_URL}/cakes/ready-made`, {
+          params: { category: categoryName, limit: 1 },
+        });
+        return {
+          name: categoryName,
+          count: response.data?.data?.pagination?.totalItems || 0,
+        };
+      });
+
+      const results = await Promise.all(countPromises);
+      const newCounts = {};
+      results.forEach((result) => {
+        newCounts[result.name] = result.count;
+      });
+      setCategoryCounts(newCounts);
+      localStorage.setItem("categoryCounts", JSON.stringify(newCounts));
+    } catch (error) {
+      console.error("Error fetching category counts:", error);
+      // Silently fail if rate limited, keep cached data
+    }
+  };
 
   const orderOptions = {
     custom: {

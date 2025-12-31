@@ -49,7 +49,7 @@ const TopReviews = () => {
           id: review.id,
           name: review.userName || review.user?.name || `Customer ${index + 1}`,
           image:
-            review.user?.profilePicture || [alexa, sarah, damilola][index % 3],
+            review.user?.profileImage || [alexa, sarah, damilola][index % 3],
           rating: review.rating,
           comment: review.comment,
         }));

@@ -25,7 +25,7 @@ const Settings = () => {
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     if (user.email) setEmail(user.email);
-    if (user.profilePicture) setProfileImage(user.profilePicture);
+    if (user.profileImage) setProfileImage(user.profileImage);
   }, []);
 
   const handleEmailUpdate = async (e) => {
