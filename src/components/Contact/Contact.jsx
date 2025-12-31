@@ -88,19 +88,19 @@ const Contact = () => {
     {
       icon: <Phone className="w-6 h-6" />,
       title: "Phone",
-      details: ["+1 (234) 567-8900", "+1 (234) 567-8901"],
-      action: "tel:+12345678900",
+      details: ["+2348093507787"],
+      action: "tel:+2348093507787",
     },
     {
       icon: <Mail className="w-6 h-6" />,
       title: "Email",
-      details: ["info@bxcakes.com", "support@bxcakes.com"],
+      details: ["info@bxcakes.com"],
       action: "mailto:info@bxcakes.com",
     },
     {
       icon: <MapPin className="w-6 h-6" />,
       title: "Address",
-      details: ["123 Bakery Street", "Sweet City, SC 12345"],
+      details: ["Ajah, Lagos, Nigeria"],
       action: null,
     },
     {
@@ -222,7 +222,7 @@ const Contact = () => {
                   value={formData.phone}
                   onChange={handleChange}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-                  placeholder="+1 (234) 567-8900"
+                  placeholder="+2348093507787"
                 />
               </div>
 

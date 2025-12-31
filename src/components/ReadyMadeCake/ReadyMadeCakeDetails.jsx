@@ -206,8 +206,8 @@ const ReadyMadeCakeDetails = () => {
                 <p className="text-sm text-gray-700">
                   <span className="font-semibold">Need help?</span> Contact us
                   at{" "}
-                  <a href="tel:+1 (234) 567-8900" className="text-orange-600">
-                    +1 (234) 567-8900
+                  <a href="tel:+2348093507787" className="text-orange-600">
+                    +2348093507787
                   </a>{" "}
                   or email{" "}
                   <a href="mailto:info@bxcakes.com" className="text-orange-600">

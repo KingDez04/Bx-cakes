@@ -136,15 +136,12 @@ const Footer = () => {
             <ul className="space-y-3">
               <li className="flex items-start space-x-3 text-gray-400">
                 <MapPin className="w-5 h-5 mt-1 shrink-0" />
-                <span>123 Bakery Street, Sweet City, SC 12345</span>
+                <span>Ajah, Lagos, Nigeria</span>
               </li>
               <li className="flex items-center space-x-3 text-gray-400">
                 <Phone className="w-5 h-5 shrink-0" />
-                <a
-                  href="tel:+1 (234) 567-8900"
-                  className="hover:text-[#FF673F]"
-                >
-                  +1 (234) 567-8900
+                <a href="tel:+2348093507787" className="hover:text-[#FF673F]">
+                  +2348093507787
                 </a>
               </li>
               <li className="flex items-center space-x-3 text-gray-400">
