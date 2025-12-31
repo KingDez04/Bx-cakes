@@ -17,6 +17,7 @@ const EditProfile = () => {
     profileImage: dp,
     address: "",
     personalNote: "",
+    phoneNumber: "",
   });
 
   useEffect(() => {
@@ -30,6 +31,7 @@ const EditProfile = () => {
           profileImage: user.profileImage || dp,
           address: user.address || "",
           personalNote: user.personalNote || "",
+          phoneNumber: user.phoneNumber || "",
         });
         setIsLoading(false);
       } catch (error) {
@@ -64,6 +66,7 @@ const EditProfile = () => {
           profileImage: user.profileImage || dp,
           address: user.address || "",
           personalNote: user.personalNote || "",
+          phoneNumber: user.phoneNumber || "",
         });
         localStorage.setItem("user", JSON.stringify(user));
       }
@@ -85,6 +88,7 @@ const EditProfile = () => {
               profileImage: user.profileImage || dp,
               address: user.address || "",
               personalNote: user.personalNote || "",
+              phoneNumber: user.phoneNumber || "",
             });
           } catch (e) {
             console.error("Error parsing cached user:", e);
@@ -114,6 +118,7 @@ const EditProfile = () => {
       const updateData = {
         name: formData.name,
         address: formData.address,
+        phoneNumber: formData.phoneNumber,
         personalNote: formData.personalNote,
       };
 
@@ -222,7 +227,7 @@ const EditProfile = () => {
           </div>
           <button
             onClick={handleImageEdit}
-            className="absolute top-2 right-2 w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-lg hover:bg-gray-100 transition-colors cursor-pointer"
+            className="absolute top-2 right-2 w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-lg hover:bg-gray-100 transition-colors"
           >
             <Edit className="w-5 h-5 text-black" />
           </button>
@@ -256,6 +261,19 @@ const EditProfile = () => {
                   onChange={handleChange}
                   className="w-full px-6 py-4 bg-[#E8E8E8] border-0 rounded-[30px] text-black text-base focus:outline-none focus:ring-2 focus:ring-[#FF5722]"
                   required
+                />
+              </div>
+
+              <div>
+                <label className="font-tertiary block text-[18.68px] font-semibold text-black mb-3">
+                  Phone Number
+                </label>
+                <input
+                  type="tel"
+                  name="phoneNumber"
+                  value={formData.phoneNumber}
+                  onChange={handleChange}
+                  className="w-full px-6 py-4 bg-[#E8E8E8] border-0 rounded-[30px] text-black text-base focus:outline-none focus:ring-2 focus:ring-[#FF5722]"
                 />
               </div>
 
