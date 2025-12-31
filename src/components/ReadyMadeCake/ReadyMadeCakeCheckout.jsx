@@ -123,10 +123,34 @@ const ReadyMadeCakeCheckout = () => {
       );
 
       if (response.data.success) {
-        toast.success("Order placed successfully! We'll contact you shortly.");
+        const linkToChat = response.data.data?.linkToChat;
+
+        toast.success("Order placed successfully!");
+
+        if (linkToChat) {
+          setTimeout(() => {
+            toast.success(
+              <div>
+                <p>Click to finalize payment on WhatsApp</p>
+                <a
+                  href={linkToChat}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: "#25D366", fontWeight: "bold" }}
+                >
+                  Open WhatsApp
+                </a>
+              </div>,
+              { duration: 8000 }
+            );
+
+            window.open(linkToChat, "_blank");
+          }, 1000);
+        }
+
         setTimeout(() => {
           navigate("/order-history");
-        }, 2000);
+        }, 3000);
       }
     } catch (error) {
       console.error("Order error:", error);
