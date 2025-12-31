@@ -101,7 +101,7 @@ const ReorderPrevious = () => {
   };
 
   const handleEditAndReorder = () => {
-    navigate("/edit-and-reorder/" + selectedOrder.id);
+    navigate("/edit-and-reorder/" + (selectedOrder._id || selectedOrder.id));
   };
 
   return (

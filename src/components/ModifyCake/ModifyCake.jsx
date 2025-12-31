@@ -116,7 +116,7 @@ const ModifyCake = () => {
   };
 
   const handleConfirmSelection = () => {
-    navigate(`/modify-cake/${selectedCake.id}/confirm`, {
+    navigate(`/modify-cake/${selectedCake._id || selectedCake.id}/confirm`, {
       state: { cake: selectedCake },
     });
   };

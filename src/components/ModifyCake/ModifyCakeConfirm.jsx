@@ -26,7 +26,9 @@ const ModifyCakeConfirm = () => {
   }
 
   const handleConfirm = () => {
-    navigate(`/modify-cake/${cake.id}/customize`, { state: { cake } });
+    navigate(`/modify-cake/${cake._id || cake.id}/customize`, {
+      state: { cake },
+    });
   };
 
   const handleCancel = () => {

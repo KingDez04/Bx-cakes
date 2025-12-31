@@ -101,7 +101,7 @@ const ReadyMadeCakeCheckout = () => {
       const totalPrice = (product.priceNGN || product.price) * quantity;
 
       const orderData = {
-        cakeId: product.id,
+        cakeId: product._id || product.id,
         quantity,
         customerNote: customerNote || undefined,
         deliveryMethod: deliveryMethod === "doorstep" ? "delivery" : "pickup",

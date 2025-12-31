@@ -94,8 +94,17 @@ const Settings = () => {
       return;
     }
 
-    if (passwordData.newPassword.length < 6) {
-      toast.error("Password must be at least 6 characters");
+    if (passwordData.newPassword.length < 8) {
+      toast.error("Password must be at least 8 characters");
+      return;
+    }
+
+    const hasUpperCase = /[A-Z]/.test(passwordData.newPassword);
+    const hasLowerCase = /[a-z]/.test(passwordData.newPassword);
+    const hasNumber = /[0-9]/.test(passwordData.newPassword);
+
+    if (!hasUpperCase || !hasLowerCase || !hasNumber) {
+      toast.error("Password must contain uppercase, lowercase, and number");
       return;
     }
 
