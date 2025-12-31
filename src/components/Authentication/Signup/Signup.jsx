@@ -113,7 +113,7 @@ const Signup = () => {
                   value={formData.fullName}
                   onChange={handleChange}
                   required
-                  className="block w-full pl-10 pr-3 py-2.5 sm:py-3 border border-gray-300 rounded-lg sm:rounded-[12.5px] focus:ring-2 focus:ring-pink-500 focus:border-transparent text-gray-900 text-sm sm:text-base"
+                  className="block w-full pl-10 pr-3 py-2.5 sm:py-3 border border-gray-300 rounded-lg sm:rounded-[12.5px] focus:ring-2 focus:ring-pink-500 focus:border-transparent text-white text-sm sm:text-base"
                   placeholder="John Doe"
                 />
               </div>
@@ -137,7 +137,7 @@ const Signup = () => {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="block w-full pl-10 pr-3 py-2.5 sm:py-3 border border-gray-300 rounded-lg sm:rounded-[12.5px] focus:ring-2 focus:ring-pink-500 focus:border-transparent text-gray-900 text-sm sm:text-base"
+                  className="block w-full pl-10 pr-3 py-2.5 sm:py-3 border border-gray-300 rounded-lg sm:rounded-[12.5px] focus:ring-2 focus:ring-pink-500 focus:border-transparent text-white text-sm sm:text-base"
                   placeholder="you@example.com"
                 />
               </div>
@@ -160,7 +160,7 @@ const Signup = () => {
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  className="block w-full pl-10 pr-3 py-2.5 sm:py-3 border border-gray-300 rounded-lg sm:rounded-[12.5px] focus:ring-2 focus:ring-pink-500 focus:border-transparent text-gray-900 text-sm sm:text-base"
+                  className="block w-full pl-10 pr-3 py-2.5 sm:py-3 border border-gray-300 rounded-lg sm:rounded-[12.5px] focus:ring-2 focus:ring-pink-500 focus:border-transparent text-white text-sm sm:text-base"
                   placeholder="+1 (234) 567-8900"
                 />
               </div>
@@ -184,7 +184,7 @@ const Signup = () => {
                   value={formData.password}
                   onChange={handleChange}
                   required
-                  className="block w-full pl-10 pr-10 py-2.5 sm:py-3 border border-gray-300 rounded-lg sm:rounded-[12.5px] focus:ring-2 focus:ring-pink-500 focus:border-transparent text-gray-900 text-sm sm:text-base"
+                  className="block w-full pl-10 pr-10 py-2.5 sm:py-3 border border-gray-300 rounded-lg sm:rounded-[12.5px] focus:ring-2 focus:ring-pink-500 focus:border-transparent text-white text-sm sm:text-base"
                   placeholder="••••••••"
                 />
                 <button
@@ -219,7 +219,7 @@ const Signup = () => {
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   required
-                  className="block w-full pl-10 pr-10 py-2.5 sm:py-3 border border-gray-300 rounded-lg sm:rounded-[12.5px] focus:ring-2 focus:ring-pink-500 focus:border-transparent text-gray-900 text-sm sm:text-base"
+                  className="block w-full pl-10 pr-10 py-2.5 sm:py-3 border border-gray-300 rounded-lg sm:rounded-[12.5px] focus:ring-2 focus:ring-pink-500 focus:border-transparent text-white text-sm sm:text-base"
                   placeholder="••••••••"
                 />
                 <button
