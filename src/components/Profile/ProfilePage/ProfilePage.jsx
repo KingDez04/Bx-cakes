@@ -14,8 +14,48 @@ const ProfilePage = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetchUserProfile();
+    const cachedUser = localStorage.getItem("user");
+    if (cachedUser && cachedUser !== "undefined") {
+      try {
+        const user = JSON.parse(cachedUser);
+        setUserData(user);
+        setIsLoading(false);
+        fetchUserProfileSilently();
+      } catch (error) {
+        console.error("Error parsing cached user:", error);
+        fetchUserProfile();
+      }
+    } else {
+      fetchUserProfile();
+    }
   }, []);
+
+  const fetchUserProfileSilently = async () => {
+    try {
+      const token = localStorage.getItem("authToken");
+      if (!token) return;
+
+      const response = await axios.get(`${API_BASE_URL}/user/profile`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.data.success) {
+        const userProfile = response.data.data;
+        if (userProfile) {
+          setUserData(userProfile);
+          localStorage.setItem("user", JSON.stringify(userProfile));
+        }
+      }
+    } catch (error) {
+      if (error.response?.status === 401) {
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("user");
+        navigate("/login");
+      }
+    }
+  };
 
   const fetchUserProfile = async () => {
     try {
@@ -48,6 +88,16 @@ const ProfilePage = () => {
         localStorage.removeItem("authToken");
         localStorage.removeItem("user");
         navigate("/login");
+      } else if (error.response?.status === 429) {
+        toast.error("Too many requests. Please wait a moment.");
+        const cachedUser = localStorage.getItem("user");
+        if (cachedUser && cachedUser !== "undefined") {
+          try {
+            setUserData(JSON.parse(cachedUser));
+          } catch (e) {
+            console.error("Error parsing cached user:", e);
+          }
+        }
       } else {
         toast.error(error.response?.data?.message || "Failed to load profile");
       }
