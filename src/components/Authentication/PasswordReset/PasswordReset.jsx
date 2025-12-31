@@ -25,7 +25,7 @@ const PasswordReset = () => {
 
     try {
       const response = await axios.post(
-        `${API_BASE_URL}/auth/forgot-password`,
+        `${API_BASE_URL}/auth/password-reset`,
         { email }
       );
 
