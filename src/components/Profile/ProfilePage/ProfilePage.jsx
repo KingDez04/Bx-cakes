@@ -33,8 +33,14 @@ const ProfilePage = () => {
       });
 
       if (response.data.success) {
-        setUserData(response.data.data.user);
-        localStorage.setItem("user", JSON.stringify(response.data.data.user));
+        const userProfile = response.data.data;
+        if (userProfile) {
+          setUserData(userProfile);
+          localStorage.setItem("user", JSON.stringify(userProfile));
+        } else {
+          toast.error("Invalid profile data");
+          navigate("/login");
+        }
       }
     } catch (error) {
       if (error.response?.status === 401) {

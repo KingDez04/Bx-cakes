@@ -33,6 +33,11 @@ const Login = () => {
       if (response.data.success) {
         const { token, user } = response.data.data;
 
+        if (!user || !token) {
+          toast.error("Invalid response from server");
+          return;
+        }
+
         localStorage.setItem("authToken", token);
         localStorage.setItem("user", JSON.stringify(user));
 

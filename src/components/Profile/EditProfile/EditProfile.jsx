@@ -96,7 +96,10 @@ const EditProfile = () => {
 
       if (response.data.success) {
         toast.success(response.data.message || "Profile updated successfully!");
-        localStorage.setItem("user", JSON.stringify(response.data.data.user));
+        const updatedUser = response.data.data;
+        if (updatedUser) {
+          localStorage.setItem("user", JSON.stringify(updatedUser));
+        }
         navigate("/profile");
       }
     } catch (error) {
@@ -136,11 +139,15 @@ const EditProfile = () => {
 
         if (response.data.success) {
           toast.success("Profile picture updated successfully!");
+          const profileImageUrl = response.data.data.profileImage;
           setFormData((prev) => ({
             ...prev,
-            profileImage: response.data.data.user.profilePicture,
+            profileImage: profileImageUrl,
           }));
-          localStorage.setItem("user", JSON.stringify(response.data.data.user));
+
+          const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
+          currentUser.profileImage = profileImageUrl;
+          localStorage.setItem("user", JSON.stringify(currentUser));
         }
       } catch (error) {
         toast.error(error.response?.data?.message || "Failed to upload image");
