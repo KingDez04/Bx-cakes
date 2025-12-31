@@ -68,6 +68,7 @@ Headers: {
       "name": "string",
       "email": "string",
       "profileImage": "string (URL, nullable)",
+      "role": "string (always 'user' for public signups)",
       "createdAt": "string (ISO 8601)"
     },
     "token": "string (JWT)"
@@ -79,6 +80,13 @@ Headers: {
 
 - 400: Email already exists
 - 422: Validation error
+
+**Security Notes:**
+
+- **All public signups are automatically assigned the 'user' role**
+- **Admin accounts CANNOT be created via this endpoint**
+- **Attempting to pass a 'role' field in the request body should be ignored by the backend**
+- **Admin accounts must be created manually by existing admins or through database seeding**
 
 ---
 
@@ -177,6 +185,86 @@ Headers: {
 
 - 400: Invalid or expired token
 - 422: Validation error
+
+---
+
+### 1.5 Create Admin Account (Admin Only)
+
+**Endpoint:** `POST /auth/admin/create`
+**Auth Required:** Yes (Admin only)
+
+**Request Body:**
+
+```json
+{
+  "name": "string (required, min: 2, max: 100)",
+  "email": "string (required, valid email)",
+  "password": "string (required, min: 8, must contain uppercase, lowercase, number)",
+  "confirmPassword": "string (required, must match password)"
+}
+```
+
+**Response (201):**
+
+```json
+{
+  "success": true,
+  "message": "Admin account created successfully",
+  "data": {
+    "user": {
+      "id": "string (UUID)",
+      "name": "string",
+      "email": "string",
+      "role": "admin",
+      "createdAt": "string (ISO 8601)"
+    }
+  }
+}
+```
+
+**Error Responses:**
+
+- 401: Not authenticated
+- 403: Forbidden (requesting user is not an admin)
+- 400: Email already exists
+- 422: Validation error
+
+**Security Notes:**
+
+- **This endpoint can ONLY be accessed by existing admin users**
+- **Requires valid admin JWT token in Authorization header**
+- **Backend must verify the requesting user has 'admin' role before creating new admin**
+- **For the first admin account, use database seeding or direct database insert**
+
+**Initial Admin Setup (Backend Implementation):**
+
+```sql
+-- SQL example for creating first admin account
+INSERT INTO users (id, name, email, password, role, created_at)
+VALUES (
+  'UUID-HERE',
+  'Super Admin',
+  'admin@bxcakes.com',
+  'HASHED_PASSWORD_HERE',
+  'admin',
+  NOW()
+);
+```
+
+Or use a seed script:
+
+```javascript
+// Backend seed script example
+const bcrypt = require("bcrypt");
+const hashedPassword = await bcrypt.hash("Admin1234!", 10);
+
+await User.create({
+  name: "Super Admin",
+  email: "admin@bxcakes.com",
+  password: hashedPassword,
+  role: "admin",
+});
+```
 
 ---
 
@@ -2405,6 +2493,189 @@ This allows future breaking changes without affecting existing clients.
 
 ---
 
+## Security Best Practices
+
+### Admin Account Management
+
+**Creating the First Admin:**
+
+The very first admin account MUST be created through one of these secure methods:
+
+1. **Database Seeding (Recommended for Development):**
+
+   ```javascript
+   // Backend seed script
+   const bcrypt = require("bcrypt");
+
+   const seedAdmin = async () => {
+     const hashedPassword = await bcrypt.hash("SecureAdminPassword123!", 10);
+
+     await User.create({
+       name: "Super Admin",
+       email: "admin@bxcakes.com",
+       password: hashedPassword,
+       role: "admin",
+       createdAt: new Date(),
+     });
+
+     console.log("First admin account created");
+   };
+   ```
+
+2. **Direct Database Insert (Production):**
+
+   ```sql
+   -- Hash the password first using bcrypt with cost factor 10
+   INSERT INTO users (id, name, email, password, role, created_at)
+   VALUES (
+     gen_random_uuid(),
+     'Super Admin',
+     'admin@bxcakes.com',
+     '$2b$10$HASHED_PASSWORD_HERE',  -- Use bcrypt to hash password
+     'admin',
+     NOW()
+   );
+   ```
+
+3. **Admin CLI Tool (Most Secure for Production):**
+   ```bash
+   # Create a backend CLI command
+   npm run create-admin -- --email=admin@bxcakes.com --name="Admin Name"
+   # This should prompt for password securely
+   ```
+
+**Creating Additional Admins:**
+
+Once the first admin exists, additional admin accounts can be created:
+
+1. **Via Admin Panel:**
+
+   - Login as an existing admin
+   - Navigate to user management section
+   - Use the "Create Admin Account" feature
+   - This calls `POST /auth/admin/create` endpoint
+
+2. **Via API (for automation):**
+   ```bash
+   curl -X POST https://api.bxcakes.com/api/auth/admin/create \
+     -H "Authorization: Bearer ADMIN_JWT_TOKEN" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "name": "New Admin",
+       "email": "newadmin@bxcakes.com",
+       "password": "SecurePassword123!",
+       "confirmPassword": "SecurePassword123!"
+     }'
+   ```
+
+### Role-Based Access Control (RBAC)
+
+**Backend Implementation Requirements:**
+
+1. **JWT Token Must Include Role:**
+
+   ```javascript
+   const token = jwt.sign(
+     {
+       userId: user.id,
+       email: user.email,
+       role: user.role, // CRITICAL: Include role in JWT
+     },
+     JWT_SECRET
+   );
+   ```
+
+2. **Middleware for Admin Routes:**
+
+   ```javascript
+   const requireAdmin = (req, res, next) => {
+     if (!req.user || req.user.role !== 'admin') {
+       return res.status(403).json({
+         success: false,
+         message: 'Access denied. Admin privileges required.'
+       });
+     }
+     next();
+   };
+
+   // Apply to admin routes
+   router.post('/auth/admin/create', authenticate, requireAdmin, createAdminAccount);
+   router.get('/admin/*', authenticate, requireAdmin, ...);
+   ```
+
+3. **Never Trust Client-Side Role:**
+   - Always validate role from JWT token, not request body
+   - Never accept 'role' parameter in signup/update endpoints
+   - Always query database to verify current user's role for sensitive operations
+
+### Security Checklist
+
+**Public Signup Endpoint (`POST /auth/signup`):**
+
+- ✅ Ignore any 'role' field in request body
+- ✅ Always set `role = 'user'` for new accounts
+- ✅ Never expose admin creation through public endpoints
+- ✅ Rate limit to prevent account spam (e.g., 10 signups per hour per IP)
+
+**Admin Creation Endpoint (`POST /auth/admin/create`):**
+
+- ✅ Require valid JWT authentication
+- ✅ Verify requesting user has 'admin' role
+- ✅ Log all admin account creations for audit trail
+- ✅ Send email notification to all existing admins
+- ✅ Consider requiring 2FA for this operation
+
+**Login Endpoint (`POST /auth/login`):**
+
+- ✅ Return user role in response
+- ✅ Include role in JWT token
+- ✅ Frontend uses role to determine access to admin routes
+- ✅ Backend still validates role on every admin endpoint
+
+**Frontend Protection:**
+
+- ✅ Hide admin routes from non-admin users
+- ✅ Redirect non-admins away from `/admin/*` routes
+- ✅ Don't expose admin creation UI to regular users
+- ✅ Always verify backend responses for authorization
+
+### Recommended Database Schema
+
+```sql
+CREATE TABLE users (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name VARCHAR(100) NOT NULL,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  password VARCHAR(255) NOT NULL,  -- bcrypt hashed
+  role VARCHAR(20) DEFAULT 'user' CHECK (role IN ('user', 'admin')),
+  profile_image VARCHAR(500),
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW(),
+
+  -- Prevent accidental role changes
+  CONSTRAINT no_role_update CHECK (role IS NOT NULL)
+);
+
+-- Index for faster role lookups
+CREATE INDEX idx_users_role ON users(role);
+CREATE INDEX idx_users_email ON users(email);
+```
+
+### Environment Variables
+
+```env
+# Required for production
+JWT_SECRET=your-super-secret-jwt-key-min-32-characters
+JWT_EXPIRES_IN=7d
+BCRYPT_ROUNDS=10
+
+# Admin notifications
+ADMIN_EMAIL=admin@bxcakes.com
+ADMIN_NOTIFICATION_EMAIL=notifications@bxcakes.com
+```
+
+---
+
 ## Contact Information
 
 For API questions or clarifications:
@@ -2415,6 +2686,6 @@ For API questions or clarifications:
 
 ---
 
-**Document Version:** 1.0
-**Last Updated:** December 13, 2025
+**Document Version:** 1.1
+**Last Updated:** December 31, 2025
 **Status:** Ready for Backend Implementation
