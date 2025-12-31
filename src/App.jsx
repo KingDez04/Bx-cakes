@@ -41,6 +41,7 @@ import ModifyCake from "./components/ModifyCake/ModifyCake";
 import ModifyCakeConfirm from "./components/ModifyCake/ModifyCakeConfirm";
 import ModifyCakeCustomize from "./components/ModifyCake/ModifyCakeCustomize";
 import ModifyCakeCheckout from "./components/ModifyCake/ModifyCakeCheckout";
+import ProtectedAdminRoute from "./components/ProtectedAdminRoute/ProtectedAdminRoute";
 
 const App = () => {
   const location = useLocation();
@@ -94,37 +95,93 @@ const App = () => {
           element={<ModifyCakeCheckout />}
         />
 
-        <Route path="/admin" element={<AdminHome />} />
-        <Route path="/admin/cake-gallery" element={<AdminCakeGallery />} />
-        <Route path="/admin/cake-gallery/add" element={<AdminAddCake />} />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedAdminRoute>
+              <AdminHome />
+            </ProtectedAdminRoute>
+          }
+        />
+        <Route
+          path="/admin/cake-gallery"
+          element={
+            <ProtectedAdminRoute>
+              <AdminCakeGallery />
+            </ProtectedAdminRoute>
+          }
+        />
+        <Route
+          path="/admin/cake-gallery/add"
+          element={
+            <ProtectedAdminRoute>
+              <AdminAddCake />
+            </ProtectedAdminRoute>
+          }
+        />
         <Route
           path="/admin/cake-gallery/deleted"
-          element={<AdminDeletedCakes />}
+          element={
+            <ProtectedAdminRoute>
+              <AdminDeletedCakes />
+            </ProtectedAdminRoute>
+          }
         />
-        <Route path="/admin/order-history" element={<AdminOrderHistory />} />
+        <Route
+          path="/admin/order-history"
+          element={
+            <ProtectedAdminRoute>
+              <AdminOrderHistory />
+            </ProtectedAdminRoute>
+          }
+        />
         <Route
           path="/admin/ready-made-cakes"
-          element={<AdminReadyMadeCakes />}
+          element={
+            <ProtectedAdminRoute>
+              <AdminReadyMadeCakes />
+            </ProtectedAdminRoute>
+          }
         />
         <Route
           path="/admin/ready-made-cakes/add"
-          element={<AdminAddReadyMadeCake />}
+          element={
+            <ProtectedAdminRoute>
+              <AdminAddReadyMadeCake />
+            </ProtectedAdminRoute>
+          }
         />
         <Route
           path="/admin/ready-made-cakes/deleted"
-          element={<AdminDeletedReadyMadeCakes />}
+          element={
+            <ProtectedAdminRoute>
+              <AdminDeletedReadyMadeCakes />
+            </ProtectedAdminRoute>
+          }
         />
         <Route
           path="/admin/customer-uploads"
-          element={<AdminCustomerUploads />}
+          element={
+            <ProtectedAdminRoute>
+              <AdminCustomerUploads />
+            </ProtectedAdminRoute>
+          }
         />
         <Route
           path="/admin/customer-uploads/review"
-          element={<AdminCakeReview />}
+          element={
+            <ProtectedAdminRoute>
+              <AdminCakeReview />
+            </ProtectedAdminRoute>
+          }
         />
         <Route
           path="/admin/customer-uploads/deleted"
-          element={<AdminDeleteCustomerUploads />}
+          element={
+            <ProtectedAdminRoute>
+              <AdminDeleteCustomerUploads />
+            </ProtectedAdminRoute>
+          }
         />
 
         <Route path="/review-order" element={<ReviewOrder />} />
