@@ -75,10 +75,19 @@ const ModifyCakeCheckout = () => {
 
       formData.tiers.forEach((tier, index) => {
         orderData.append(`tiers[${index}][tierNumber]`, tier.tierNumber);
-        orderData.append(
-          `tiers[${index}][size]`,
-          tier.size.diameter || tier.size.length
-        );
+
+        let sizeString;
+        if (formData.shape === "Circle") {
+          sizeString = `Ø:${tier.size.diameter || tier.size.length || 8}" H:${
+            tier.size.height || 10
+          }"`;
+        } else {
+          sizeString = `L:${tier.size.length || 8}" W:${
+            tier.size.width || 8
+          }" H:${tier.size.height || 10}"`;
+        }
+        orderData.append(`tiers[${index}][size]`, sizeString);
+
         orderData.append(
           `tiers[${index}][numberOfFlavors]`,
           tier.flavors.length

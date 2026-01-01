@@ -70,10 +70,19 @@ const AdminAddCake = () => {
       submitData.append("covering", formData.coveringType);
 
       submitData.append("tiers[0][tierNumber]", 1);
-      submitData.append(
-        "tiers[0][size]",
-        formData.tier1.diameter || formData.tier1.length
-      );
+
+      let sizeString;
+      if (formData.shapeOfCake === "Circle") {
+        sizeString = `Ø:${
+          formData.tier1.diameter || formData.tier1.length || 8
+        }" H:${formData.tier1.height || 10}"`;
+      } else {
+        sizeString = `L:${formData.tier1.length || 8}" W:${
+          formData.tier1.width || 8
+        }" H:${formData.tier1.height || 10}"`;
+      }
+      submitData.append("tiers[0][size]", sizeString);
+
       submitData.append(
         "tiers[0][numberOfFlavors]",
         formData.tier1.numberOfFlavours || 1
