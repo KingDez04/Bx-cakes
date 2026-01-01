@@ -324,102 +324,181 @@ const AdminReadyMadeCakes = () => {
         </div>
 
         <div className="p-4 md:p-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-            {cakes.map((cake) => (
-              <div
-                key={cake.id}
-                onClick={() => handleSelectCake(cake.id)}
-                onMouseEnter={() => setHoveredCake(cake.id)}
-                onMouseLeave={() => setHoveredCake(null)}
-                className={`bg-white rounded-lg overflow-hidden cursor-pointer transition-all relative ${
-                  selectedCakes.includes(cake.id)
-                    ? "ring-4 ring-[#FF6B3D]"
-                    : "border border-gray-200 hover:shadow-lg"
-                }`}
-              >
-                <div className="relative h-48 bg-gray-200">
-                  <img
-                    src={cake.image}
-                    alt={cake.name}
-                    className="w-full h-full object-cover"
-                  />
+          {isLoading ? (
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
+            </div>
+          ) : cakes?.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+              {cakes.map((cake) => (
+                <div
+                  key={cake.id}
+                  onClick={() => handleSelectCake(cake.id)}
+                  onMouseEnter={() => setHoveredCake(cake.id)}
+                  onMouseLeave={() => setHoveredCake(null)}
+                  className={`bg-white rounded-lg overflow-hidden cursor-pointer transition-all relative ${
+                    selectedCakes.includes(cake.id)
+                      ? "ring-4 ring-[#FF6B3D]"
+                      : "border border-gray-200 hover:shadow-lg"
+                  }`}
+                >
+                  <div className="relative h-48 bg-gray-200">
+                    {cake.image ? (
+                      <img
+                        src={cake.image}
+                        alt={cake.name || "Cake"}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.target.style.display = "none";
+                          e.target.parentElement.classList.add(
+                            "flex",
+                            "items-center",
+                            "justify-center"
+                          );
+                          e.target.parentElement.innerHTML =
+                            '<span class="text-gray-400">No Image</span>';
+                        }}
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center h-full text-gray-400">
+                        No Image
+                      </div>
+                    )}
 
-                  {hoveredCake === (cake._id || cake.id) && (
-                    <div className="absolute inset-0 bg-black/70 flex flex-col justify-end p-4 gap-2">
-                      <button className="w-full py-2 bg-[#FF6B3D] text-white rounded-md text-sm font-medium hover:bg-[#FF5722] transition-colors cursor-pointer">
-                        Edit Cake
-                      </button>
-                      <button className="w-full py-2 bg-green-600 text-white rounded-md text-sm font-medium hover:bg-green-700 transition-colors cursor-pointer">
-                        Mark Cake As Sold
-                      </button>
-                      <button className="w-full py-2 bg-white text-black rounded-md text-sm font-medium hover:bg-gray-100 transition-colors border-2 border-dashed border-gray-300 cursor-pointer">
-                        Delete Cake
-                      </button>
+                    {hoveredCake === (cake._id || cake.id) && (
+                      <div className="absolute inset-0 bg-black/70 flex flex-col justify-end p-4 gap-2">
+                        <button className="w-full py-2 bg-[#FF6B3D] text-white rounded-md text-sm font-medium hover:bg-[#FF5722] transition-colors cursor-pointer">
+                          Edit Cake
+                        </button>
+                        <button className="w-full py-2 bg-green-600 text-white rounded-md text-sm font-medium hover:bg-green-700 transition-colors cursor-pointer">
+                          Mark Cake As Sold
+                        </button>
+                        <button className="w-full py-2 bg-white text-black rounded-md text-sm font-medium hover:bg-gray-100 transition-colors border-2 border-dashed border-gray-300 cursor-pointer">
+                          Delete Cake
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="p-4">
+                    <h3 className="font-semibold text-sm mb-3 line-clamp-2">
+                      {cake.name || "Unnamed Cake"}
+                    </h3>
+
+                    {(cake.tier1Flavor ||
+                      cake.tier2Flavor ||
+                      cake.tiers?.length > 0) && (
+                      <div className="space-y-2 mb-3 text-xs text-gray-600">
+                        {cake.tier1Flavor && (
+                          <div>
+                            <div className="flex gap-2">
+                              <span className="font-medium">Tier 1:</span>
+                              <span>{cake.tier1Flavor}</span>
+                            </div>
+                            {(cake.tier1Measurement ||
+                              cake.tier1FlavorSpec) && (
+                              <div className="ml-4 text-gray-500">
+                                {cake.tier1Measurement && (
+                                  <div>{cake.tier1Measurement}</div>
+                                )}
+                                {cake.tier1FlavorSpec && (
+                                  <div>{cake.tier1FlavorSpec}</div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                        {cake.tier2Flavor && (
+                          <div>
+                            <div className="flex gap-2">
+                              <span className="font-medium">Tier 2:</span>
+                              <span>{cake.tier2Flavor}</span>
+                            </div>
+                            {(cake.tier2Measurement ||
+                              cake.tier2FlavorSpec) && (
+                              <div className="ml-4 text-gray-500">
+                                {cake.tier2Measurement && (
+                                  <div>{cake.tier2Measurement}</div>
+                                )}
+                                {cake.tier2FlavorSpec && (
+                                  <div>{cake.tier2FlavorSpec}</div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                        {!cake.tier1Flavor &&
+                          !cake.tier2Flavor &&
+                          cake.tiers?.length > 0 &&
+                          cake.tiers.map((tier, idx) => (
+                            <div key={idx}>
+                              <div className="flex gap-2">
+                                <span className="font-medium">
+                                  Tier {tier.tierNumber || idx + 1}:
+                                </span>
+                                <span>
+                                  {tier.flavors
+                                    ?.map((f) => f.name)
+                                    .join(", ") || "N/A"}
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                      </div>
+                    )}
+
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {cake.covering && (
+                        <span className="px-2 py-1 bg-pink-100 text-pink-800 rounded text-xs">
+                          {cake.covering}
+                        </span>
+                      )}
+                      {cake.category && (
+                        <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
+                          {cake.category}
+                        </span>
+                      )}
+                      {cake.condition && (
+                        <span className="px-2 py-1 bg-purple-100 text-purple-800 rounded text-xs">
+                          {cake.condition}
+                        </span>
+                      )}
                     </div>
-                  )}
+
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {cake.gender && (
+                        <span className="px-2 py-1 bg-indigo-100 text-indigo-800 rounded text-xs">
+                          {cake.gender}
+                        </span>
+                      )}
+                      {cake.availability && (
+                        <span className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs">
+                          {cake.availability}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      {cake.stock !== undefined && (
+                        <span className="text-green-600 text-sm font-medium">
+                          {cake.stock} Available
+                        </span>
+                      )}
+                      {cake.price && (
+                        <span className="text-lg font-bold">
+                          &#8358;{cake.price.toLocaleString()}
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
-
-                <div className="p-4">
-                  <h3 className="font-semibold text-sm mb-3 line-clamp-2">
-                    {cake.name}
-                  </h3>
-
-                  <div className="space-y-2 mb-3 text-xs text-gray-600">
-                    <div>
-                      <div className="flex gap-2">
-                        <span className="font-medium">Tier 1</span>
-                        <span>{cake.tier1Flavor}</span>
-                      </div>
-                      <div className="ml-4">
-                        <div>{cake.tier1Measurement}</div>
-                        <div>{cake.tier1FlavorSpec}</div>
-                      </div>
-                    </div>
-                    <div>
-                      <div className="flex gap-2">
-                        <span className="font-medium">Tier 2</span>
-                        <span>{cake.tier2Flavor}</span>
-                      </div>
-                      <div className="ml-4">
-                        <div>{cake.tier2Measurement}</div>
-                        <div>{cake.tier2FlavorSpec}</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    <span className="px-2 py-1 bg-pink-100 text-pink-800 rounded text-xs">
-                      {cake.covering}
-                    </span>
-                    <span className="px-2 py-1 bg-pink-100 text-pink-800 rounded text-xs">
-                      {cake.category}
-                    </span>
-                    <span className="px-2 py-1 bg-pink-100 text-pink-800 rounded text-xs">
-                      {cake.condition}
-                    </span>
-                  </div>
-
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    <span className="px-2 py-1 bg-pink-100 text-pink-800 rounded text-xs">
-                      {cake.gender}
-                    </span>
-                    <span className="px-2 py-1 bg-pink-100 text-pink-800 rounded text-xs">
-                      {cake.availability}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <span className="text-green-600 text-sm font-medium">
-                      {cake.stock} Available
-                    </span>
-                    <span className="text-lg font-bold">
-                      NGN{cake.price.toLocaleString()}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="flex justify-center items-center py-12">
+              <p className="text-gray-500">No cakes found</p>
+            </div>
+          )}
         </div>
       </div>
 

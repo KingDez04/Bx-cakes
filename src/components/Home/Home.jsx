@@ -190,7 +190,7 @@ const Home = () => {
             Some Of Our Best Cakes
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {categories.map((category, index) => (
+            {categories?.map((category, index) => (
               <Link
                 key={index}
                 to={`/readymade-cake?category=${category.name}`}

@@ -185,8 +185,8 @@ const ReadyMadeCake = () => {
           <main className="flex-1">
             <div className="mb-6 flex justify-between items-center">
               <p className="text-gray-300">
-                Showing {products.length} cake
-                {products.length !== 1 ? "s" : ""}
+                Showing {products?.length || 0} cake
+                {products?.length !== 1 ? "s" : ""}
               </p>
             </div>
 
@@ -197,7 +197,7 @@ const ReadyMadeCake = () => {
                   <p className="text-gray-600">Loading cakes...</p>
                 </div>
               </div>
-            ) : products.length === 0 ? (
+            ) : products?.length === 0 ? (
               <div className="bg-gray-800 rounded-lg shadow-md p-12 text-center">
                 <p className="text-gray-400 text-lg">
                   No cakes found matching your criteria.

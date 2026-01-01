@@ -18,7 +18,6 @@ const AdminHome = () => {
   const [ageFilter, setAgeFilter] = useState("All");
   const [period, setPeriod] = useState("all");
 
-  // API state
   const [stats, setStats] = useState({
     totalOrders: 0,
     inProgressOrders: 0,
@@ -54,17 +53,24 @@ const AdminHome = () => {
 
       if (response.data.success) {
         const data = response.data.data;
+
+        const ordersByStatus = Array.isArray(data.ordersByStatus)
+          ? data.ordersByStatus
+          : [];
+
         setStats({
           totalOrders: data.totalOrders || 0,
           inProgressOrders:
-            data.ordersByStatus?.find((o) => o.status === "processing")
-              ?.count || 0,
+            ordersByStatus.find((o) => o.status === "processing")?.count ||
+            data.inProgressOrders ||
+            0,
           completedOrders:
-            data.ordersByStatus?.find((o) => o.status === "completed")?.count ||
+            ordersByStatus.find((o) => o.status === "completed")?.count ||
+            data.completedOrders ||
             0,
           totalRevenue: data.totalRevenue || 0,
         });
-        setOrders(data.recentOrders || []);
+        setOrders(Array.isArray(data.recentOrders) ? data.recentOrders : []);
       }
     } catch (error) {
       console.error("Error fetching dashboard stats:", error);

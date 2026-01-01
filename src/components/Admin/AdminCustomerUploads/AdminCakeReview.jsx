@@ -158,90 +158,185 @@ const AdminCakeReview = () => {
         </div>
 
         <div className="p-4 md:p-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="space-y-3">
-              {customerOrders.map((order, index) => (
-                <div
-                  key={order._id || order.id}
-                  onClick={() => setSelectedOrder(order)}
-                  className={`p-4 border rounded-lg cursor-pointer transition-colors ${
-                    (selectedOrder?._id || selectedOrder?.id) ===
-                    (order._id || order.id)
-                      ? "bg-[#FFB4A3]"
-                      : index === 0
-                      ? "bg-[#FFB4A3]"
-                      : "bg-white border border-gray-200 hover:bg-gray-50"
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-600">
-                        Order ID: {order.orderId}
-                      </p>
-                      <h3 className="font-bold text-lg">
-                        {order.customerName}
-                      </h3>
-                      <p className="text-sm text-gray-600">{order.location}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm text-gray-600">
-                        Order Date: {order.orderDate}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
+          {isLoading ? (
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
             </div>
-
-            <div className="bg-gray-200 rounded-lg p-6 min-h-[500px]">
-              {(selectedOrder || customerOrders[0]) && (
-                <>
-                  <div className="bg-gray-300 rounded-lg h-96 mb-4 flex items-center justify-center">
-                    {selectedOrder?.image || customerOrders[0].image ? (
-                      <img
-                        src={selectedOrder?.image || customerOrders[0].image}
-                        alt="Cake"
-                        className="w-full h-full object-cover rounded-lg"
-                      />
-                    ) : (
-                      <span className="text-gray-500">Image Preview</span>
-                    )}
+          ) : customerOrders?.length > 0 ? (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="space-y-3">
+                {customerOrders.map((order, index) => (
+                  <div
+                    key={order._id || order.id}
+                    onClick={() => setSelectedOrder(order)}
+                    className={`p-4 border rounded-lg cursor-pointer transition-colors ${
+                      (selectedOrder?._id || selectedOrder?.id) ===
+                      (order._id || order.id)
+                        ? "bg-[#FFB4A3]"
+                        : index === 0
+                        ? "bg-[#FFB4A3]"
+                        : "bg-white border border-gray-200 hover:bg-gray-50"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-gray-600">
+                          Order ID: {order.orderId}
+                        </p>
+                        <h3 className="font-bold text-lg">
+                          {order.customerName}
+                        </h3>
+                        <p className="text-sm text-gray-600">
+                          {order.location}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm text-gray-600">
+                          Order Date: {order.orderDate}
+                        </p>
+                      </div>
+                    </div>
                   </div>
+                ))}
+              </div>
 
-                  {(selectedOrder?.tags || customerOrders[0].tags).length >
-                    0 && (
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {(selectedOrder?.tags || customerOrders[0].tags).map(
-                        (tag, idx) => (
-                          <span
-                            key={idx}
-                            className="px-3 py-1 bg-pink-100 text-pink-800 rounded text-sm"
-                          >
-                            {tag}
-                          </span>
-                        )
+              <div className="bg-gray-200 rounded-lg p-6 min-h-[500px]">
+                {selectedOrder || customerOrders[0] ? (
+                  <>
+                    <div className="bg-gray-300 rounded-lg h-96 mb-4 flex items-center justify-center overflow-hidden">
+                      {selectedOrder?.image || customerOrders[0]?.image ? (
+                        <img
+                          src={selectedOrder?.image || customerOrders[0].image}
+                          alt="Cake"
+                          className="w-full h-full object-cover rounded-lg"
+                          onError={(e) => {
+                            e.target.style.display = "none";
+                            e.target.parentElement.innerHTML =
+                              '<span class="text-gray-500">Image not available</span>';
+                          }}
+                        />
+                      ) : (
+                        <span className="text-gray-500">
+                          No Image Available
+                        </span>
                       )}
                     </div>
-                  )}
 
-                  <div className="flex gap-3">
-                    <button
-                      onClick={handleDecline}
-                      className="flex-1 py-3 bg-[#8B0000] text-white rounded-md hover:bg-[#700000] transition-colors font-medium cursor-pointer"
-                    >
-                      Decline
-                    </button>
-                    <button
-                      onClick={handleApprove}
-                      className="flex-1 py-3 bg-[#FF6B3D] text-white rounded-md hover:bg-[#FF5722] transition-colors font-medium cursor-pointer"
-                    >
-                      Approve
-                    </button>
+                    {(selectedOrder || customerOrders[0]) && (
+                      <div className="mb-4">
+                        <div className="text-sm space-y-1 mb-3">
+                          <p className="font-semibold">Order Details:</p>
+                          <p className="text-gray-700">
+                            Order ID:{" "}
+                            {(selectedOrder || customerOrders[0]).orderNumber}
+                          </p>
+                          <p className="text-gray-700">
+                            Customer:{" "}
+                            {(selectedOrder || customerOrders[0]).customerName}
+                          </p>
+                          {(selectedOrder || customerOrders[0]).location && (
+                            <p className="text-gray-700">
+                              Location:{" "}
+                              {(selectedOrder || customerOrders[0]).location}
+                            </p>
+                          )}
+                        </div>
+
+                        {(selectedOrder?.cakeDetails ||
+                          customerOrders[0]?.cakeDetails) && (
+                          <div className="text-sm space-y-1 mb-3">
+                            <p className="font-semibold">Cake Details:</p>
+                            {(
+                              selectedOrder?.cakeDetails ||
+                              customerOrders[0]?.cakeDetails
+                            ).shape && (
+                              <p className="text-gray-700">
+                                Shape:{" "}
+                                {
+                                  (
+                                    selectedOrder?.cakeDetails ||
+                                    customerOrders[0]?.cakeDetails
+                                  ).shape
+                                }
+                              </p>
+                            )}
+                            {(
+                              selectedOrder?.cakeDetails ||
+                              customerOrders[0]?.cakeDetails
+                            ).tiers && (
+                              <p className="text-gray-700">
+                                Tiers:{" "}
+                                {
+                                  (
+                                    selectedOrder?.cakeDetails ||
+                                    customerOrders[0]?.cakeDetails
+                                  ).tiers
+                                }
+                              </p>
+                            )}
+                            {(
+                              selectedOrder?.cakeDetails ||
+                              customerOrders[0]?.cakeDetails
+                            ).covering && (
+                              <p className="text-gray-700">
+                                Covering:{" "}
+                                {
+                                  (
+                                    selectedOrder?.cakeDetails ||
+                                    customerOrders[0]?.cakeDetails
+                                  ).covering
+                                }
+                              </p>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {(selectedOrder?.tags || customerOrders[0]?.tags) &&
+                      (selectedOrder?.tags || customerOrders[0]?.tags).length >
+                        0 && (
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          {(selectedOrder?.tags || customerOrders[0]?.tags).map(
+                            (tag, idx) => (
+                              <span
+                                key={idx}
+                                className="px-3 py-1 bg-pink-100 text-pink-800 rounded text-sm"
+                              >
+                                {tag}
+                              </span>
+                            )
+                          )}
+                        </div>
+                      )}
+
+                    <div className="flex gap-3">
+                      <button
+                        onClick={handleDecline}
+                        className="flex-1 py-3 bg-[#8B0000] text-white rounded-md hover:bg-[#700000] transition-colors font-medium cursor-pointer"
+                      >
+                        Decline
+                      </button>
+                      <button
+                        onClick={handleApprove}
+                        className="flex-1 py-3 bg-[#FF6B3D] text-white rounded-md hover:bg-[#FF5722] transition-colors font-medium cursor-pointer"
+                      >
+                        Approve
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex items-center justify-center h-full text-gray-500">
+                    <p>No reviews to display</p>
                   </div>
-                </>
-              )}
+                )}
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="flex justify-center items-center py-12">
+              <p className="text-gray-500">No customer orders found</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

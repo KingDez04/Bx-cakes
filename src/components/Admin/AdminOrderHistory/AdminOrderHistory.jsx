@@ -65,7 +65,8 @@ const AdminOrderHistory = () => {
 
       if (response.data.success) {
         // Transform API data to match table format
-        const transformedOrders = response.data.data.orders.map((order) => ({
+        const ordersData = response.data.data.orders || [];
+        const transformedOrders = ordersData.map((order) => ({
           orderId: order.orderNumber || "No ID",
           orderDate: new Date(order.createdAt).toLocaleDateString(),
           deliveryDate: order.deliveryDate

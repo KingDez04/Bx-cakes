@@ -156,7 +156,7 @@ const AdminCustomerUploads = () => {
               className="relative flex items-center gap-2 px-4 py-2 bg-gray-200 border border-gray-300 rounded-md hover:bg-gray-300 transition-colors text-sm font-medium cursor-pointer"
             >
               Cake Review
-              {customerUploads.some((cake) => cake.pendingReviews > 0) && (
+              {customerUploads?.some((cake) => cake.pendingReviews > 0) && (
                 <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
                   10
                 </span>
@@ -238,7 +238,7 @@ const AdminCustomerUploads = () => {
             <div className="flex justify-center items-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
             </div>
-          ) : customerUploads.length > 0 ? (
+          ) : customerUploads?.length > 0 ? (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
                 {customerUploads.map((cake) => (
@@ -252,93 +252,149 @@ const AdminCustomerUploads = () => {
                     }`}
                   >
                     <div className="relative h-48 bg-gray-200">
-                      <img
-                        src={cake.image}
-                        alt={cake.name}
-                        className="w-full h-full object-cover"
-                      />
+                      {cake.image ? (
+                        <img
+                          src={cake.image}
+                          alt={cake.name || "Customer cake upload"}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.target.style.display = "none";
+                            e.target.parentElement.innerHTML =
+                              '<div class="flex items-center justify-center h-full text-gray-400">No Image</div>';
+                          }}
+                        />
+                      ) : (
+                        <div className="flex items-center justify-center h-full text-gray-400">
+                          No Image
+                        </div>
+                      )}
                     </div>
 
                     <div className="p-4">
-                      <div className="flex items-center gap-4 mb-3 text-sm text-gray-700">
-                        <div className="flex items-center gap-1">
-                          <svg
-                            className="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <circle cx="12" cy="12" r="10" strokeWidth="2" />
-                          </svg>
-                          <span>{cake.shape}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <svg
-                            className="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                            />
-                          </svg>
-                          <span>{cake.size}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <svg
-                            className="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                            />
-                          </svg>
-                          <span>{cake.tiers}</span>
-                        </div>
+                      <div className="flex items-center flex-wrap gap-2 mb-3 text-sm text-gray-700">
+                        {cake.shape && (
+                          <div className="flex items-center gap-1">
+                            <svg
+                              className="w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <circle cx="12" cy="12" r="10" strokeWidth="2" />
+                            </svg>
+                            <span>{cake.shape}</span>
+                          </div>
+                        )}
+                        {cake.size && (
+                          <div className="flex items-center gap-1">
+                            <svg
+                              className="w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                              />
+                            </svg>
+                            <span>{cake.size}</span>
+                          </div>
+                        )}
+                        {cake.tiers && (
+                          <div className="flex items-center gap-1">
+                            <svg
+                              className="w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                              />
+                            </svg>
+                            <span>
+                              {cake.tiers} {cake.tiers > 1 ? "Tiers" : "Tier"}
+                            </span>
+                          </div>
+                        )}
                       </div>
 
                       <div className="space-y-2 mb-3 text-xs text-gray-600">
-                        <div>
-                          <div className="flex gap-2">
-                            <span className="font-medium">Tier 1</span>
-                            <span>{cake.tier1Flavor}</span>
+                        {cake.tier1Flavor && (
+                          <div>
+                            <div className="flex gap-2">
+                              <span className="font-medium">Tier 1:</span>
+                              <span>{cake.tier1Flavor}</span>
+                            </div>
+                            {(cake.tier1Measurement ||
+                              cake.tier1FlavorSpec) && (
+                              <div className="ml-4 text-gray-500">
+                                {cake.tier1Measurement && (
+                                  <div>{cake.tier1Measurement}</div>
+                                )}
+                                {cake.tier1FlavorSpec && (
+                                  <div>{cake.tier1FlavorSpec}</div>
+                                )}
+                              </div>
+                            )}
                           </div>
-                          <div className="ml-4">
-                            <div>{cake.tier1Measurement}</div>
-                            <div>{cake.tier1FlavorSpec}</div>
+                        )}
+                        {cake.tier2Flavor && (
+                          <div>
+                            <div className="flex gap-2">
+                              <span className="font-medium">Tier 2:</span>
+                              <span>{cake.tier2Flavor}</span>
+                            </div>
+                            {(cake.tier2Measurement ||
+                              cake.tier2FlavorSpec) && (
+                              <div className="ml-4 text-gray-500">
+                                {cake.tier2Measurement && (
+                                  <div>{cake.tier2Measurement}</div>
+                                )}
+                                {cake.tier2FlavorSpec && (
+                                  <div>{cake.tier2FlavorSpec}</div>
+                                )}
+                              </div>
+                            )}
                           </div>
-                        </div>
-                        <div>
-                          <div className="flex gap-2">
-                            <span className="font-medium">Tier 2</span>
-                            <span>{cake.tier2Flavor}</span>
-                          </div>
-                          <div className="ml-4">
-                            <div>{cake.tier2Measurement}</div>
-                            <div>{cake.tier2FlavorSpec}</div>
-                          </div>
-                        </div>
+                        )}
                       </div>
 
                       <div className="flex flex-wrap gap-2">
-                        <span className="px-2 py-1 bg-pink-100 text-pink-800 rounded text-xs">
-                          {cake.covering}
-                        </span>
-                        <span className="px-2 py-1 bg-pink-100 text-pink-800 rounded text-xs">
-                          {cake.category}
-                        </span>
-                        <span className="px-2 py-1 bg-pink-100 text-pink-800 rounded text-xs">
-                          {cake.condition}
-                        </span>
+                        {cake.covering && (
+                          <span className="px-2 py-1 bg-pink-100 text-pink-800 rounded text-xs">
+                            {cake.covering}
+                          </span>
+                        )}
+                        {cake.category && (
+                          <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
+                            {cake.category}
+                          </span>
+                        )}
+                        {cake.condition && (
+                          <span className="px-2 py-1 bg-purple-100 text-purple-800 rounded text-xs">
+                            {cake.condition}
+                          </span>
+                        )}
+                        {cake.status && (
+                          <span
+                            className={`px-2 py-1 rounded text-xs ${
+                              cake.status === "pending"
+                                ? "bg-yellow-100 text-yellow-800"
+                                : cake.status === "approved"
+                                ? "bg-green-100 text-green-800"
+                                : "bg-red-100 text-red-800"
+                            }`}
+                          >
+                            {cake.status}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>

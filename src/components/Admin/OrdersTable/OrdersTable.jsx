@@ -66,7 +66,7 @@ const OrdersTable = ({ orders, onStatusUpdate }) => {
             </tr>
           </thead>
           <tbody>
-            {orders.map((order, index) => (
+            {orders?.map((order, index) => (
               <tr
                 key={index}
                 className="border-b border-gray-200 hover:bg-gray-50"

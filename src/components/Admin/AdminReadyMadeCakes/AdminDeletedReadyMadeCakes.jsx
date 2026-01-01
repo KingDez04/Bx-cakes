@@ -238,7 +238,7 @@ const AdminDeletedReadyMadeCakes = () => {
             <div className="flex justify-center items-center py-20">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FF6B3D]"></div>
             </div>
-          ) : deletedCakes.length === 0 ? (
+          ) : deletedCakes?.length === 0 ? (
             <div className="text-center py-20">
               <p className="text-gray-500 text-lg">No deleted cakes found</p>
             </div>
